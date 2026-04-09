@@ -35,7 +35,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/auth/login');
+    router.push('/login');
   };
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');

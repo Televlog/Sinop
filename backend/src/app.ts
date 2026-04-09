@@ -130,6 +130,9 @@ app.get('/health', (_req, res) => {
 // =============================
 // API Routes
 // =============================
+// Health check for Railway/deployment
+app.get('/api/health', (_req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
