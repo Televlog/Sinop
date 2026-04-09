@@ -1,0 +1,261 @@
+// Prisma schema - SQLite compatible (for local dev)
+// Enums replaced with String, Json replaced with String
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// USER & AUTH
+// ================================
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  passwordHash    String?
+  googleId        String?   @unique
+  appleId         String?   @unique
+  avatarUrl       String?
+  mfaEnabled      Boolean   @default(false)
+  mfaSecret       String?
+  role            String    @default("USER")
+  currency        String    @default("USD")
+  timezone        String    @default("UTC")
+  notifyEmail     Boolean   @default(true)
+  notifyPush      Boolean   @default(true)
+  fcmToken        String?
+  isVerified      Boolean   @default(false)
+  verifyToken     String?
+  resetToken      String?
+  resetTokenExp   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  accounts        Account[]
+  transactions    Transaction[]
+  subscriptions   Subscription[]
+  budgets         Budget[]
+  savingsGoals    SavingsGoal[]
+  notifications   Notification[]
+  refreshTokens   RefreshToken[]
+  aiInsights      AIInsight[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  token       String    @unique
+  expiresAt   DateTime
+  userAgent   String?
+  ipAddress   String?
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// ================================
+// BANK ACCOUNTS
+// ================================
+model Account {
+  id              String    @id @default(cuid())
+  userId          String
+  plaidAccountId  String?   @unique
+  plaidItemId     String?
+  accessToken     String?
+  institutionId   String?
+  institutionName String
+  accountName     String
+  accountMask     String?
+  accountType     String    @default("CHECKING")
+  accountSubtype  String?
+  balance         Float     @default(0)
+  availableBalance Float?
+  currency        String    @default("USD")
+  isManual        Boolean   @default(false)
+  lastSynced      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+// ================================
+// TRANSACTIONS
+// ================================
+model Transaction {
+  id                  String    @id @default(cuid())
+  userId              String
+  accountId           String?
+  plaidTransactionId  String?   @unique
+  amount              Float
+  currency            String    @default("USD")
+  description         String
+  merchant            String?
+  merchantLogo        String?
+  category            String?
+  subcategory         String?
+  date                DateTime
+  type                String    @default("EXPENSE")
+  isRecurring         Boolean   @default(false)
+  recurringGroupId    String?
+  receiptUrl          String?
+  receiptText         String?
+  notes               String?
+  tags                String    @default("[]")
+  isPending           Boolean   @default(false)
+  location            String?
+  paymentMethod       String?
+  aiCategorizationConfidence Float?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account             Account?  @relation(fields: [accountId], references: [id])
+
+  @@index([userId])
+  @@index([date])
+  @@index([category])
+  @@index([isRecurring])
+  @@map("transactions")
+}
+
+// ================================
+// SUBSCRIPTIONS
+// ================================
+model Subscription {
+  id              String    @id @default(cuid())
+  userId          String
+  name            String
+  amount          Float
+  currency        String    @default("USD")
+  billingCycle    String    @default("MONTHLY")
+  nextBillingDate DateTime
+  startDate       DateTime?
+  category        String?
+  logoUrl         String?
+  color           String?
+  url             String?
+  status          String    @default("ACTIVE")
+  cancelledAt     DateTime?
+  cancellationUrl String?
+  notes           String?
+  reminderDays    Int       @default(3)
+  autoDetected    Boolean   @default(false)
+  transactionRef  String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([nextBillingDate])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+// ================================
+// BUDGETS
+// ================================
+model Budget {
+  id              String    @id @default(cuid())
+  userId          String
+  category        String
+  amount          Float
+  spent           Float     @default(0)
+  month           Int
+  year            Int
+  alertThreshold  Float     @default(0.8)
+  alertSent       Boolean   @default(false)
+  color           String?
+  icon            String?
+  rollover        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, month, year])
+  @@index([userId])
+  @@map("budgets")
+}
+
+// ================================
+// SAVINGS GOALS
+// ================================
+model SavingsGoal {
+  id              String    @id @default(cuid())
+  userId          String
+  name            String
+  targetAmount    Float
+  currentAmount   Float     @default(0)
+  targetDate      DateTime?
+  category        String?
+  icon            String?
+  color           String?
+  status          String    @default("ACTIVE")
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("savings_goals")
+}
+
+// ================================
+// NOTIFICATIONS
+// ================================
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  message     String
+  type        String    @default("GENERAL")
+  isRead      Boolean   @default(false)
+  metadata    String?
+  actionUrl   String?
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+// ================================
+// AI INSIGHTS
+// ================================
+model AIInsight {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String    @default("SPENDING_PATTERN")
+  title       String
+  description String
+  data        String?
+  isRead      Boolean   @default(false)
+  severity    String    @default("INFO")
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("ai_insights")
+}
