@@ -19,7 +19,7 @@ export default function NotificationsPage() {
 
   const { data, isLoading } = useQuery<{ notifications: any[] }>({
     queryKey: ['notifications'],
-    queryFn: reportApi.notifications,
+    queryFn: () => reportApi.notifications(),
   });
 
   const markRead = useMutation({
