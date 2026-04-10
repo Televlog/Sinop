@@ -56,8 +56,18 @@ app.use(helmet({
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow any localhost port in dev, or configured origins in prod
-    if (!origin || origin.startsWith('http://localhost') || origin.startsWith('exp://') || origin === env.CLIENT_URL || origin === env.MOBILE_URL) {
+    if (
+      !origin ||
+      origin.startsWith('http://localhost') ||
+      origin.startsWith('https://localhost') ||
+      origin.startsWith('exp://') ||
+      origin.endsWith('.netlify.app') ||
+      origin.endsWith('.loca.lt') ||
+      origin.endsWith('.ngrok-free.app') ||
+      origin.endsWith('.github.io') ||
+      origin === env.CLIENT_URL ||
+      origin === env.MOBILE_URL
+    ) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -65,7 +75,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'bypass-tunnel-reminder'],
 }));
 
 app.use(compression());
