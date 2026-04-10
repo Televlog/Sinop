@@ -1,5 +1,5 @@
 [build]
-  command = "npx expo export --platform web"
+  command = "npm install && npx expo install react-native-web@~0.19.10 react-dom@18.2.0 @expo/metro-runtime && npx expo export --platform web"
   publish = "dist"
 
 [build.environment]
