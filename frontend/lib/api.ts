@@ -6,7 +6,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api';
 export const api = axios.create({
   baseURL: API_URL,
   timeout: 30000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'bypass-tunnel-reminder': 'true',
+  },
 });
 
 // Request interceptor – attach access token
