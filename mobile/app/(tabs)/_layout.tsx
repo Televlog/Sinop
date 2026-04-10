@@ -6,12 +6,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
 
 export default function TabsLayout() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isInitialized } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!isAuthenticated) router.replace('/(auth)/login');
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isInitialized]);
 
   return (
     <Tabs

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import * as SecureStore from 'expo-secure-store';
 import { authApi } from '../services/api';
+import { storage } from '../utils/storage';
 
 interface User {
   id: string;
@@ -15,6 +15,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitialized: boolean;
   login: (email: string, password: string, mfaCode?: string) => Promise<any>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -22,10 +23,11 @@ interface AuthState {
   setUser: (user: User) => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  isInitialized: false,
 
   setUser: (user) => set({ user, isAuthenticated: true }),
 
@@ -37,8 +39,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ isLoading: false });
         return data;
       }
-      await SecureStore.setItemAsync('access_token', data.accessToken);
-      await SecureStore.setItemAsync('refresh_token', data.refreshToken);
+      await storage.setItem('access_token', data.accessToken);
+      await storage.setItem('refresh_token', data.refreshToken);
       set({ user: data.user, isAuthenticated: true, isLoading: false });
       return data;
     } catch (error) {
@@ -51,8 +53,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true });
     try {
       const data = await authApi.register({ name, email, password });
-      await SecureStore.setItemAsync('access_token', data.accessToken);
-      await SecureStore.setItemAsync('refresh_token', data.refreshToken);
+      await storage.setItem('access_token', data.accessToken);
+      await storage.setItem('refresh_token', data.refreshToken);
       set({ user: data.user, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -61,22 +63,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
-    const refreshToken = await SecureStore.getItemAsync('refresh_token');
+    const refreshToken = await storage.getItem('refresh_token');
     if (refreshToken) await authApi.logout(refreshToken).catch(() => {});
-    await SecureStore.deleteItemAsync('access_token');
-    await SecureStore.deleteItemAsync('refresh_token');
+    await storage.deleteItem('access_token');
+    await storage.deleteItem('refresh_token');
     set({ user: null, isAuthenticated: false });
   },
 
   fetchMe: async () => {
-    const token = await SecureStore.getItemAsync('access_token');
-    if (!token) return;
+    const token = await storage.getItem('access_token');
+    if (!token) {
+      set({ isInitialized: true });
+      return;
+    }
     try {
       const data = await authApi.getMe();
-      set({ user: data.user, isAuthenticated: true });
+      set({ user: data.user, isAuthenticated: true, isInitialized: true });
     } catch {
-      await SecureStore.deleteItemAsync('access_token');
-      set({ user: null, isAuthenticated: false });
+      await storage.deleteItem('access_token');
+      set({ user: null, isAuthenticated: false, isInitialized: true });
     }
   },
 }));
