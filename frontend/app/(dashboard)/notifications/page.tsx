@@ -17,7 +17,7 @@ const TYPE_COLORS: Record<string, string> = {
 export default function NotificationsPage() {
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<{ notifications: any[] }>({
     queryKey: ['notifications'],
     queryFn: reportApi.notifications,
   });
@@ -27,7 +27,7 @@ export default function NotificationsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
   });
 
-  const notifications = data?.notifications ?? [];
+  const notifications: any[] = data?.notifications ?? [];
   const unread = notifications.filter((n: any) => !n.isRead).length;
 
   return (

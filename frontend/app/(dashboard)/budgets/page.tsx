@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { budgetApi, getErrorMessage } from '@/lib/api';
-import { formatCurrency, cn, progressColor, percentageColor } from '@/lib/utils';
+import { formatCurrency, formatDate, cn, progressColor, percentageColor } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
 import { useToast } from '@/hooks/useToast';
 import { Plus, Target, Trash2, Edit2, TrendingUp } from 'lucide-react';
