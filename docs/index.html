@@ -136,9 +136,13 @@
       </div>
 
       <!-- Charts -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-        <div class="card p-4"><h3 class="font-bold text-gray-900 text-sm mb-3">📈 Trend</h3><canvas id="trend-chart" height="140"></canvas></div>
-        <div class="card p-4"><h3 class="font-bold text-gray-900 text-sm mb-3">🥧 By Category</h3><canvas id="pie-chart" height="140"></canvas></div>
+      <div class="card p-4 mb-4">
+        <div class="flex gap-2 mb-3">
+          <div class="tab-btn active text-xs py-1.5 px-3" onclick="switchChartTab('trend')" id="ct-trend">📈 Trend</div>
+          <div class="tab-btn text-xs py-1.5 px-3" onclick="switchChartTab('pie')" id="ct-pie">🥧 Categories</div>
+        </div>
+        <div id="chart-trend" style="position:relative;height:160px;"><canvas id="trend-chart"></canvas></div>
+        <div id="chart-pie" class="hidden" style="position:relative;height:160px;"><canvas id="pie-chart"></canvas></div>
       </div>
 
       <!-- Tabs: Recent / Upcoming / Insights -->
@@ -521,6 +525,12 @@ function showPage(name){
   if(name==='subscriptions')renderSubs();
   if(name==='admin')renderAdmin();
 }
+function switchChartTab(tab){
+  ['trend','pie'].forEach(t=>{
+    document.getElementById('chart-'+t).classList.toggle('hidden',t!==tab);
+    document.getElementById('ct-'+t).classList.toggle('active',t===tab);
+  });
+}
 function switchDashTab(tab){
   ['recent','upcoming','insights'].forEach(t=>{
     document.getElementById('dash-tab-'+t).classList.toggle('hidden',t!==tab);
@@ -844,17 +854,17 @@ function initCharts(){
   tChart=new Chart(document.getElementById('trend-chart'),{
     type:'line',
     data:{labels:['Nov','Dec','Jan','Feb','Mar','Apr'],datasets:[
-      {label:'Income',data:[4200,5100,4800,6200,5500,6350],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#10b981'},
-      {label:'Expenses',data:[3100,2900,3200,2600,3000,2847],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#ef4444'},
+      {label:'Income',data:[4200,5100,4800,6200,5500,6350],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4,pointRadius:2,pointBackgroundColor:'#10b981'},
+      {label:'Expenses',data:[3100,2900,3200,2600,3000,2847],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',fill:true,tension:.4,pointRadius:2,pointBackgroundColor:'#ef4444'},
     ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:6}}},scales:{y:{beginAtZero:false,ticks:{callback:v=>'$'+v.toLocaleString(),font:{size:9}},grid:{color:'#f3f4f6'}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:4}}},scales:{y:{beginAtZero:false,ticks:{callback:v=>'$'+v.toLocaleString(),font:{size:9},maxTicksLimit:4},grid:{color:'#f3f4f6'}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
   });
   const cats=['Groceries','Food & Dining','Transport','Entertainment','Shopping','Utilities','Other'];
   const vals=[124.5,25.25,24,25.98,67.23,89,32.15];
   pChart=new Chart(document.getElementById('pie-chart'),{
     type:'doughnut',
     data:{labels:cats,datasets:[{data:vals,backgroundColor:cats.map(c=>CAT_COLORS[c]||'#94a3b8'),borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:9,padding:5}}},cutout:'58%'}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:8,padding:4}}},cutout:'62%'}
   });
 }
 
