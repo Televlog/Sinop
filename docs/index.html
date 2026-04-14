@@ -8,51 +8,69 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#f9fafb; }
-  .nav-item { transition: all .2s; }
-  .nav-item.active { background:#ede9fe; color:#4f46e5; }
-  .nav-item:hover { background:#f3f4f6; }
-  .nav-item.active:hover { background:#ede9fe; }
-  .page { display:none; }
-  .page.active { display:block; }
-  .progress-bar { transition: width .6s ease; }
-  .card { background:#fff; border-radius:16px; box-shadow:0 1px 8px rgba(0,0,0,.06); }
-  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:50; align-items:center; justify-content:center; }
-  .modal-overlay.open { display:flex; }
-  input, select { outline:none; }
-  input:focus, select:focus { border-color:#4f46e5 !important; }
-  @media(max-width:768px){ #sidebar{display:none;} #bottom-nav{display:flex;} #main{margin-left:0 !important; padding-bottom:80px;} }
-  @media(min-width:769px){ #sidebar{display:flex;} #bottom-nav{display:none;} #main{margin-left:240px;} }
-  #bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f3f4f6; z-index:40; height:64px; }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;}
+  .page{display:none;}.page.active{display:block;}
+  .nav-item{transition:all .15s;cursor:pointer;}
+  .nav-item.active{background:#ede9fe;color:#4f46e5;}
+  .nav-item:hover:not(.active){background:#f3f4f6;}
+  .card{background:#fff;border-radius:16px;box-shadow:0 1px 8px rgba(0,0,0,.06);}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:#fff;border-radius:20px;padding:24px;width:100%;max-width:420px;margin:16px;max-height:90vh;overflow-y:auto;}
+  input:focus,select:focus{border-color:#4f46e5!important;outline:none;}
+  .tab-btn{padding:8px 16px;border-radius:10px;font-size:13px;font-weight:600;color:#6b7280;transition:all .15s;cursor:pointer;}
+  .tab-btn.active{background:#4f46e5;color:#fff;}
+  .progress-bar{transition:width .6s ease;}
+  .badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:9999px;font-size:11px;font-weight:700;}
+  .badge-admin{background:#ede9fe;color:#4f46e5;}
+  .badge-user{background:#f0fdf4;color:#16a34a;}
+  .badge-inactive{background:#f3f4f6;color:#9ca3af;}
+  @media(max-width:768px){
+    #sidebar{display:none!important;}
+    #bottom-nav{display:flex!important;}
+    #main-content{margin-left:0!important;padding-bottom:72px;}
+  }
+  @media(min-width:769px){
+    #sidebar{display:flex!important;}
+    #bottom-nav{display:none!important;}
+    #main-content{margin-left:220px;}
+  }
+  #bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #f3f4f6;z-index:40;height:60px;}
+  .bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:600;color:#9ca3af;cursor:pointer;transition:color .15s;}
+  .bn.active{color:#4f46e5;}
+  .action-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;font-size:12px;transition:all .15s;cursor:pointer;}
+  .edit-btn{background:#eff6ff;color:#2563eb;}.edit-btn:hover{background:#dbeafe;}
+  .del-btn{background:#fef2f2;color:#ef4444;}.del-btn:hover{background:#fee2e2;}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-50 to-purple-50">
-    <div class="card w-full max-w-md p-8">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <span class="text-white text-3xl font-bold">F</span>
+  <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50">
+    <div class="card w-full max-w-sm p-8">
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <span class="text-white text-2xl font-bold">F</span>
         </div>
-        <h1 class="text-2xl font-bold text-gray-900">Welcome back</h1>
-        <p class="text-gray-500 mt-1">Sign in to your FinTrack account</p>
+        <h1 class="text-xl font-bold text-gray-900">Welcome to FinTrack</h1>
+        <p class="text-gray-500 text-sm mt-1">Sign in to your account</p>
       </div>
       <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 mb-4 text-sm"></div>
-      <div class="space-y-4">
+      <div class="space-y-3">
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-          <input id="login-email" type="email" value="demo@fintrack.app" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900" placeholder="you@example.com">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Email</label>
+          <input id="login-email" type="email" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="you@example.com">
         </div>
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
-          <input id="login-password" type="password" value="Demo123!" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900" placeholder="••••••••">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Password</label>
+          <input id="login-password" type="password" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="••••••••">
         </div>
-        <button onclick="doLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">
-          Sign In
-        </button>
-        <p class="text-center text-sm text-gray-500">Demo: <b>demo@fintrack.app</b> / <b>Demo123!</b></p>
+        <button onclick="doLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors mt-1">Sign In</button>
+      </div>
+      <div class="mt-4 p-3 bg-gray-50 rounded-xl text-xs text-gray-500 space-y-1">
+        <p><b>Demo User:</b> demo@fintrack.app / Demo123!</p>
+        <p><b>Admin:</b> admin@fintrack.app / Admin123!</p>
       </div>
     </div>
   </div>
@@ -62,668 +80,831 @@
 <div id="app" style="display:none">
 
   <!-- Sidebar -->
-  <div id="sidebar" class="fixed top-0 left-0 h-full w-60 bg-white border-r border-gray-100 flex-col z-40 shadow-sm">
-    <div class="p-6 border-b border-gray-100">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center">
-          <span class="text-white font-bold text-sm">F</span>
-        </div>
-        <span class="font-bold text-gray-900 text-lg">FinTrack</span>
+  <div id="sidebar" class="fixed top-0 left-0 h-full w-[220px] bg-white border-r border-gray-100 flex-col z-40">
+    <div class="p-5 border-b border-gray-100 flex items-center gap-2">
+      <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+        <span class="text-white font-bold text-sm">F</span>
       </div>
+      <span class="font-bold text-gray-900">FinTrack</span>
     </div>
-    <nav class="flex-1 p-4 space-y-1">
-      <button onclick="showPage('dashboard')" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="dashboard">
-        <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
-      </button>
-      <button onclick="showPage('transactions')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="transactions">
-        <i class="fa-solid fa-arrow-right-arrow-left w-5 text-center"></i> Transactions
-      </button>
-      <button onclick="showPage('budgets')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="budgets">
-        <i class="fa-solid fa-chart-pie w-5 text-center"></i> Budgets
-      </button>
-      <button onclick="showPage('subscriptions')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="subscriptions">
-        <i class="fa-solid fa-rotate w-5 text-center"></i> Subscriptions
-      </button>
-      <button onclick="showPage('profile')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="profile">
-        <i class="fa-solid fa-user w-5 text-center"></i> Profile
-      </button>
+    <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+      <div class="nav-item active flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700" onclick="showPage('dashboard')" data-page="dashboard"><i class="fa-solid fa-house w-4 text-center text-xs"></i>Dashboard</div>
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700" onclick="showPage('transactions')" data-page="transactions"><i class="fa-solid fa-arrow-right-arrow-left w-4 text-center text-xs"></i>Transactions</div>
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700" onclick="showPage('budgets')" data-page="budgets"><i class="fa-solid fa-chart-pie w-4 text-center text-xs"></i>Budgets</div>
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700" onclick="showPage('subscriptions')" data-page="subscriptions"><i class="fa-solid fa-rotate w-4 text-center text-xs"></i>Subscriptions</div>
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700" onclick="showPage('profile')" data-page="profile"><i class="fa-solid fa-user w-4 text-center text-xs"></i>Profile</div>
+      <div id="admin-nav" class="nav-item hidden flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700" onclick="showPage('admin')" data-page="admin"><i class="fa-solid fa-shield-halved w-4 text-center text-xs"></i>Admin</div>
     </nav>
-    <div class="p-4 border-t border-gray-100">
-      <button onclick="doLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
-        <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Logout
-      </button>
+    <div class="p-3 border-t border-gray-100">
+      <div id="sidebar-user" class="flex items-center gap-2 px-3 py-2 mb-1"></div>
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-500" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket w-4 text-center text-xs"></i>Logout</div>
     </div>
   </div>
 
-  <!-- Bottom Nav (mobile) -->
+  <!-- Bottom Nav -->
   <div id="bottom-nav" class="hidden">
-    <button onclick="showPage('dashboard')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="dashboard">
-      <i class="fa-solid fa-house text-lg"></i> Home
-    </button>
-    <button onclick="showPage('transactions')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="transactions">
-      <i class="fa-solid fa-arrow-right-arrow-left text-lg"></i> Tx
-    </button>
-    <button onclick="showPage('budgets')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="budgets">
-      <i class="fa-solid fa-chart-pie text-lg"></i> Budget
-    </button>
-    <button onclick="showPage('subscriptions')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="subscriptions">
-      <i class="fa-solid fa-rotate text-lg"></i> Subs
-    </button>
-    <button onclick="showPage('profile')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="profile">
-      <i class="fa-solid fa-user text-lg"></i> Profile
-    </button>
+    <div class="bn active" onclick="showPage('dashboard')" data-page="dashboard"><i class="fa-solid fa-house text-base"></i>Home</div>
+    <div class="bn" onclick="showPage('transactions')" data-page="transactions"><i class="fa-solid fa-arrow-right-arrow-left text-base"></i>Tx</div>
+    <div class="bn" onclick="showPage('budgets')" data-page="budgets"><i class="fa-solid fa-chart-pie text-base"></i>Budget</div>
+    <div class="bn" onclick="showPage('subscriptions')" data-page="subscriptions"><i class="fa-solid fa-rotate text-base"></i>Subs</div>
+    <div class="bn" onclick="showPage('profile')" data-page="profile"><i class="fa-solid fa-user text-base"></i>Me</div>
   </div>
 
-  <!-- Main -->
-  <div id="main" class="min-h-screen">
+  <div id="main-content" class="min-h-screen">
 
-    <!-- DASHBOARD -->
-    <div id="page-dashboard" class="page active p-6 max-w-5xl mx-auto">
-      <div class="flex items-center justify-between mb-6">
+    <!-- ===== DASHBOARD ===== -->
+    <div id="page-dashboard" class="page active p-4 max-w-5xl mx-auto">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900" id="dash-greeting">Good morning, Alex 👋</h1>
-          <p class="text-gray-500 text-sm mt-1">Here's your financial snapshot</p>
+          <h1 id="dash-greeting" class="text-xl font-bold text-gray-900">Good morning 👋</h1>
+          <p class="text-gray-400 text-xs mt-0.5">Financial snapshot for April 2026</p>
         </div>
-        <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">AJ</div>
+        <div id="dash-avatar" class="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xs"></div>
       </div>
 
-      <!-- Summary Cards -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="card p-4 col-span-2 md:col-span-1 bg-gradient-to-br from-indigo-600 to-purple-600">
+      <!-- Summary Row -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div class="col-span-2 md:col-span-1 rounded-2xl p-4 bg-gradient-to-br from-indigo-600 to-violet-600 text-white">
           <p class="text-indigo-200 text-xs font-semibold">NET SAVINGS</p>
-          <p class="text-white text-2xl font-bold mt-1" id="net-savings">$3,503</p>
-          <p class="text-indigo-200 text-xs mt-2">This month</p>
+          <p id="net-savings" class="text-2xl font-black mt-0.5">$0</p>
+          <p class="text-indigo-200 text-xs mt-1">This month</p>
         </div>
-        <div class="card p-4">
-          <p class="text-gray-500 text-xs font-semibold">INCOME</p>
-          <p class="text-green-600 text-xl font-bold mt-1" id="total-income">$6,350</p>
-          <p class="text-gray-400 text-xs mt-2">↑ This month</p>
-        </div>
-        <div class="card p-4">
-          <p class="text-gray-500 text-xs font-semibold">EXPENSES</p>
-          <p class="text-red-500 text-xl font-bold mt-1" id="total-expenses">$2,847</p>
-          <p class="text-gray-400 text-xs mt-2">↓ This month</p>
-        </div>
-        <div class="card p-4">
-          <p class="text-gray-500 text-xs font-semibold">SAVINGS RATE</p>
-          <p class="text-indigo-600 text-xl font-bold mt-1" id="savings-rate">55%</p>
-          <p class="text-gray-400 text-xs mt-2">Of income saved</p>
-        </div>
+        <div class="card p-4"><p class="text-gray-400 text-xs font-semibold">INCOME</p><p id="total-income" class="text-lg font-black text-green-500 mt-0.5">$0</p><p class="text-gray-300 text-xs mt-1">↑ earned</p></div>
+        <div class="card p-4"><p class="text-gray-400 text-xs font-semibold">EXPENSES</p><p id="total-expenses" class="text-lg font-black text-red-500 mt-0.5">$0</p><p class="text-gray-300 text-xs mt-1">↓ spent</p></div>
+        <div class="card p-4"><p class="text-gray-400 text-xs font-semibold">SAVED</p><p id="savings-rate" class="text-lg font-black text-indigo-600 mt-0.5">0%</p><p class="text-gray-300 text-xs mt-1">of income</p></div>
       </div>
 
-      <!-- Charts Row -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div class="card p-5">
-          <h3 class="font-bold text-gray-900 mb-4">📈 Income vs Expenses</h3>
-          <canvas id="trend-chart" height="180"></canvas>
-        </div>
-        <div class="card p-5">
-          <h3 class="font-bold text-gray-900 mb-4">🥧 Spending by Category</h3>
-          <canvas id="pie-chart" height="180"></canvas>
-        </div>
+      <!-- Charts -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <div class="card p-4"><h3 class="font-bold text-gray-900 text-sm mb-3">📈 Trend</h3><canvas id="trend-chart" height="140"></canvas></div>
+        <div class="card p-4"><h3 class="font-bold text-gray-900 text-sm mb-3">🥧 By Category</h3><canvas id="pie-chart" height="140"></canvas></div>
       </div>
 
-      <!-- AI Insights -->
-      <div class="card p-5 mb-6 border-l-4 border-indigo-400 bg-indigo-50">
-        <p class="font-bold text-indigo-900">✨ AI Insight</p>
-        <p class="text-indigo-700 text-sm mt-1">You're spending $154/month on subscriptions. Cancelling unused ones could save you up to $600/year.</p>
-      </div>
-
-      <!-- Recent Transactions & Upcoming Subs -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="card p-5">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-gray-900">🕒 Recent Transactions</h3>
-            <button onclick="showPage('transactions')" class="text-indigo-600 text-sm font-semibold">See all</button>
+      <!-- Tabs: Recent / Upcoming / Insights -->
+      <div class="card p-4">
+        <div class="flex gap-2 mb-4">
+          <div class="tab-btn active" onclick="switchDashTab('recent')" id="dt-recent">Recent Tx</div>
+          <div class="tab-btn" onclick="switchDashTab('upcoming')" id="dt-upcoming">Upcoming Bills</div>
+          <div class="tab-btn" onclick="switchDashTab('insights')" id="dt-insights">✨ Insights</div>
+        </div>
+        <div id="dash-tab-recent" class="space-y-3"></div>
+        <div id="dash-tab-upcoming" class="space-y-3 hidden"></div>
+        <div id="dash-tab-insights" class="space-y-3 hidden">
+          <div class="bg-indigo-50 border-l-4 border-indigo-400 rounded-xl p-4">
+            <p class="font-bold text-indigo-900 text-sm">Subscription Overload</p>
+            <p class="text-indigo-700 text-xs mt-1">You're spending $154/month on 6 subscriptions. Cancelling 2 unused ones could save ~$600/year.</p>
           </div>
-          <div id="recent-tx" class="space-y-3"></div>
-        </div>
-        <div class="card p-5">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-gray-900">⏰ Upcoming Bills</h3>
-            <button onclick="showPage('subscriptions')" class="text-indigo-600 text-sm font-semibold">See all</button>
+          <div class="bg-amber-50 border-l-4 border-amber-400 rounded-xl p-4">
+            <p class="font-bold text-amber-900 text-sm">Budget Alert</p>
+            <p class="text-amber-700 text-xs mt-1">Your Food & Dining budget is 8% used. You're on track this month!</p>
           </div>
-          <div id="upcoming-subs" class="space-y-3"></div>
+          <div class="bg-green-50 border-l-4 border-green-400 rounded-xl p-4">
+            <p class="font-bold text-green-900 text-sm">Savings Goal</p>
+            <p class="text-green-700 text-xs mt-1">At your current rate, you'll reach your Emergency Fund goal by September 2026.</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- TRANSACTIONS -->
-    <div id="page-transactions" class="page p-6 max-w-4xl mx-auto">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Transactions</h1>
-        <button onclick="openModal('add-tx-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-colors">
-          <i class="fa-solid fa-plus mr-1"></i> Add
-        </button>
+    <!-- ===== TRANSACTIONS ===== -->
+    <div id="page-transactions" class="page p-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-xl font-bold text-gray-900">Transactions</h1>
+        <button onclick="openModal('modal-add-tx')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-colors"><i class="fa-solid fa-plus mr-1"></i>Add</button>
       </div>
-      <div class="card p-4 mb-4">
-        <div class="flex gap-3 flex-wrap">
-          <input id="tx-search" type="text" placeholder="🔍 Search transactions..." oninput="renderTransactions()" class="flex-1 min-w-48 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm">
-          <select id="tx-filter" onchange="renderTransactions()" class="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold">
-            <option value="">All</option>
-            <option value="INCOME">Income</option>
-            <option value="EXPENSE">Expense</option>
-          </select>
-        </div>
+      <div class="card p-3 mb-3 flex gap-2 flex-wrap">
+        <input id="tx-search" type="text" placeholder="🔍 Search..." oninput="renderTx()" class="flex-1 min-w-36 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm">
+        <select id="tx-filter" onchange="renderTx()" class="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold">
+          <option value="">All Types</option><option value="INCOME">Income</option><option value="EXPENSE">Expense</option>
+        </select>
       </div>
-      <div id="tx-list" class="space-y-3"></div>
+      <div id="tx-list" class="space-y-2"></div>
     </div>
 
-    <!-- BUDGETS -->
-    <div id="page-budgets" class="page p-6 max-w-4xl mx-auto">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Budgets</h1>
-        <button onclick="openModal('add-budget-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-colors">
-          <i class="fa-solid fa-plus mr-1"></i> Add Budget
-        </button>
+    <!-- ===== BUDGETS ===== -->
+    <div id="page-budgets" class="page p-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-xl font-bold text-gray-900">Budgets</h1>
+        <button onclick="openModal('modal-add-budget')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-colors"><i class="fa-solid fa-plus mr-1"></i>Add Budget</button>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="card p-4 text-center">
-          <p class="text-gray-500 text-xs font-semibold">TOTAL BUDGETED</p>
-          <p class="text-2xl font-bold text-gray-900 mt-1" id="total-budgeted">$1,460</p>
-        </div>
-        <div class="card p-4 text-center">
-          <p class="text-gray-500 text-xs font-semibold">TOTAL SPENT</p>
-          <p class="text-2xl font-bold text-red-500 mt-1" id="total-budget-spent">$0</p>
-        </div>
-        <div class="card p-4 text-center">
-          <p class="text-gray-500 text-xs font-semibold">REMAINING</p>
-          <p class="text-2xl font-bold text-green-600 mt-1" id="total-remaining">$1,460</p>
-        </div>
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="card p-3 text-center"><p class="text-gray-400 text-xs font-semibold">BUDGETED</p><p id="b-total" class="text-lg font-black text-gray-900 mt-0.5">$0</p></div>
+        <div class="card p-3 text-center"><p class="text-gray-400 text-xs font-semibold">SPENT</p><p id="b-spent" class="text-lg font-black text-red-500 mt-0.5">$0</p></div>
+        <div class="card p-3 text-center"><p class="text-gray-400 text-xs font-semibold">LEFT</p><p id="b-left" class="text-lg font-black text-green-600 mt-0.5">$0</p></div>
       </div>
-      <div id="budget-list" class="space-y-4"></div>
+      <div id="budget-list" class="space-y-3"></div>
     </div>
 
-    <!-- SUBSCRIPTIONS -->
-    <div id="page-subscriptions" class="page p-6 max-w-4xl mx-auto">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Subscriptions</h1>
-        <button onclick="openModal('add-sub-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-colors">
-          <i class="fa-solid fa-plus mr-1"></i> Add
-        </button>
+    <!-- ===== SUBSCRIPTIONS ===== -->
+    <div id="page-subscriptions" class="page p-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-xl font-bold text-gray-900">Subscriptions</h1>
+        <button onclick="openModal('modal-add-sub')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-colors"><i class="fa-solid fa-plus mr-1"></i>Add</button>
       </div>
-      <div class="grid grid-cols-2 gap-4 mb-6">
-        <div class="card p-4 text-center">
-          <p class="text-gray-500 text-xs font-semibold">MONTHLY TOTAL</p>
-          <p class="text-2xl font-bold text-gray-900 mt-1" id="sub-monthly">$0</p>
-        </div>
-        <div class="card p-4 text-center">
-          <p class="text-gray-500 text-xs font-semibold">YEARLY TOTAL</p>
-          <p class="text-2xl font-bold text-gray-900 mt-1" id="sub-yearly">$0</p>
-        </div>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="card p-3 text-center"><p class="text-gray-400 text-xs font-semibold">MONTHLY</p><p id="sub-monthly" class="text-lg font-black text-gray-900 mt-0.5">$0</p></div>
+        <div class="card p-3 text-center"><p class="text-gray-400 text-xs font-semibold">YEARLY</p><p id="sub-yearly" class="text-lg font-black text-gray-900 mt-0.5">$0</p></div>
       </div>
-      <div id="sub-list" class="space-y-3"></div>
+      <div id="sub-list" class="space-y-2"></div>
     </div>
 
-    <!-- PROFILE -->
-    <div id="page-profile" class="page p-6 max-w-2xl mx-auto">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">Profile</h1>
-      <div class="card p-6 mb-4 flex items-center gap-4">
-        <div class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xl font-bold">AJ</div>
-        <div>
-          <p class="font-bold text-gray-900 text-lg">Alex Johnson</p>
-          <p class="text-gray-500 text-sm">demo@fintrack.app</p>
-          <span class="bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-0.5 rounded-full mt-1 inline-block">Demo Account</span>
-        </div>
+    <!-- ===== PROFILE ===== -->
+    <div id="page-profile" class="page p-4 max-w-2xl mx-auto">
+      <h1 class="text-xl font-bold text-gray-900 mb-4">Profile</h1>
+      <div class="card p-5 mb-3 flex items-center gap-4">
+        <div id="profile-avatar" class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg"></div>
+        <div><p id="profile-name" class="font-bold text-gray-900"></p><p id="profile-email" class="text-gray-400 text-sm"></p><span id="profile-badge" class="badge mt-1"></span></div>
       </div>
-      <div class="card p-5 mb-4 space-y-4">
-        <h3 class="font-bold text-gray-900">Account Settings</h3>
+      <div class="card p-5 mb-3 space-y-4">
+        <h3 class="font-bold text-gray-900 text-sm">Settings</h3>
         <div class="flex items-center justify-between">
-          <div><p class="font-semibold text-gray-700 text-sm">Push Notifications</p><p class="text-gray-400 text-xs">Get alerts for bills and budgets</p></div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" checked class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-          </label>
+          <div><p class="font-semibold text-gray-700 text-sm">Push Notifications</p><p class="text-gray-400 text-xs">Alerts for bills and budgets</p></div>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div></label>
         </div>
         <div class="flex items-center justify-between">
           <div><p class="font-semibold text-gray-700 text-sm">Email Reports</p><p class="text-gray-400 text-xs">Weekly spending summary</p></div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" checked class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-          </label>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div></label>
         </div>
         <div class="flex items-center justify-between">
-          <div><p class="font-semibold text-gray-700 text-sm">Currency</p></div>
-          <select class="border-2 border-gray-200 rounded-xl px-3 py-1.5 text-sm font-semibold">
-            <option>USD</option><option>EUR</option><option>GBP</option><option>PHP</option>
-          </select>
+          <p class="font-semibold text-gray-700 text-sm">Currency</p>
+          <select class="border-2 border-gray-200 rounded-xl px-3 py-1.5 text-sm font-semibold"><option>USD</option><option>EUR</option><option>GBP</option><option>PHP</option></select>
         </div>
       </div>
-      <div class="card p-5 mb-4 space-y-2">
-        <h3 class="font-bold text-gray-900 mb-3">App Info</h3>
-        <div class="flex justify-between text-sm"><span class="text-gray-500">Version</span><span class="font-semibold text-gray-700">1.0.0</span></div>
-        <div class="flex justify-between text-sm"><span class="text-gray-500">Plan</span><span class="font-semibold text-indigo-600">Free Demo</span></div>
-        <div class="flex justify-between text-sm"><span class="text-gray-500">Data</span><span class="font-semibold text-gray-700">Stored locally</span></div>
+      <div class="card p-5 mb-3 space-y-2 text-sm">
+        <p class="font-bold text-gray-900 mb-2">App Info</p>
+        <div class="flex justify-between"><span class="text-gray-400">Version</span><span class="font-semibold">1.0.0</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Data</span><span class="font-semibold">Stored locally</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Plan</span><span class="font-semibold text-indigo-600">Free Demo</span></div>
       </div>
-      <button onclick="doLogout()" class="w-full card p-4 text-red-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-50 transition-colors">
-        <i class="fa-solid fa-right-from-bracket"></i> Logout
-      </button>
+      <button onclick="doLogout()" class="w-full card p-4 text-red-500 font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-50 transition-colors"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
+    </div>
+
+    <!-- ===== ADMIN ===== -->
+    <div id="page-admin" class="page p-4 max-w-5xl mx-auto">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-shield-halved text-white"></i></div>
+        <div><h1 class="text-xl font-bold text-gray-900">Admin Panel</h1><p class="text-gray-400 text-xs">Manage users, roles and permissions</p></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+        <div class="card p-4 text-center"><p class="text-gray-400 text-xs font-semibold">TOTAL USERS</p><p class="text-2xl font-black text-gray-900 mt-1" id="admin-total">4</p></div>
+        <div class="card p-4 text-center"><p class="text-gray-400 text-xs font-semibold">ADMINS</p><p class="text-2xl font-black text-indigo-600 mt-1" id="admin-admins">1</p></div>
+        <div class="card p-4 text-center"><p class="text-gray-400 text-xs font-semibold">ACTIVE</p><p class="text-2xl font-black text-green-600 mt-1" id="admin-active">3</p></div>
+        <div class="card p-4 text-center"><p class="text-gray-400 text-xs font-semibold">INACTIVE</p><p class="text-2xl font-black text-gray-400 mt-1" id="admin-inactive">1</p></div>
+      </div>
+
+      <!-- Permissions Matrix -->
+      <div class="card p-5 mb-4">
+        <h3 class="font-bold text-gray-900 mb-3 text-sm">Role Permissions</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead><tr class="border-b border-gray-100">
+              <th class="text-left py-2 pr-4 text-gray-500 font-semibold">Feature</th>
+              <th class="text-center py-2 px-4 text-gray-500 font-semibold">User</th>
+              <th class="text-center py-2 px-4 text-indigo-600 font-semibold">Admin</th>
+            </tr></thead>
+            <tbody id="perm-table" class="divide-y divide-gray-50"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- User Table -->
+      <div class="card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-gray-900 text-sm">All Users</h3>
+          <button onclick="openModal('modal-add-user')" class="bg-indigo-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-plus mr-1"></i>Add User</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-gray-100 text-xs text-gray-400 font-semibold">
+              <th class="text-left py-2 pr-4">User</th>
+              <th class="text-left py-2 pr-4">Role</th>
+              <th class="text-left py-2 pr-4">Status</th>
+              <th class="text-right py-2">Actions</th>
+            </tr></thead>
+            <tbody id="user-table" class="divide-y divide-gray-50"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
   </div>
 </div>
 
-<!-- ADD TRANSACTION MODAL -->
-<div id="add-tx-modal" class="modal-overlay" onclick="closeModalOutside(event,'add-tx-modal')">
-  <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
-    <div class="flex items-center justify-between mb-5">
-      <h3 class="font-bold text-gray-900 text-lg">Add Transaction</h3>
-      <button onclick="closeModal('add-tx-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+<!-- ===== MODALS ===== -->
+
+<!-- Add/Edit Transaction -->
+<div id="modal-add-tx" class="modal-overlay" onclick="outsideClose(event,'modal-add-tx')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-4">
+      <h3 id="tx-modal-title" class="font-bold text-gray-900">Add Transaction</h3>
+      <button onclick="closeModal('modal-add-tx')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
     </div>
-    <div class="space-y-4">
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-        <input id="tx-desc" type="text" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="e.g. Grocery shopping"></div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Amount ($)</label>
-        <input id="tx-amount" type="number" step="0.01" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="0.00"></div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Type</label>
-        <select id="tx-type" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold">
-          <option value="EXPENSE">Expense</option><option value="INCOME">Income</option>
+    <input type="hidden" id="tx-edit-id">
+    <div class="space-y-3">
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Description</label><input id="f-tx-desc" type="text" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="e.g. Grocery shopping"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Amount ($)</label><input id="f-tx-amount" type="number" step="0.01" min="0" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="0.00"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-gray-600 mb-1">Type</label>
+          <select id="f-tx-type" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+            <option value="EXPENSE">Expense</option><option value="INCOME">Income</option>
+          </select></div>
+        <div><label class="block text-xs font-semibold text-gray-600 mb-1">Date</label><input id="f-tx-date" type="date" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm"></div>
+      </div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Category</label>
+        <select id="f-tx-cat" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+          <option>Food & Dining</option><option>Groceries</option><option>Transportation</option><option>Entertainment</option><option>Shopping</option><option>Healthcare</option><option>Utilities</option><option>Fitness</option><option>Income</option><option>Other</option>
         </select></div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Category</label>
-        <select id="tx-cat" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold">
-          <option>Food & Dining</option><option>Groceries</option><option>Transportation</option>
-          <option>Entertainment</option><option>Shopping</option><option>Healthcare</option>
-          <option>Utilities</option><option>Income</option><option>Other</option>
-        </select></div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Date</label>
-        <input id="tx-date" type="date" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm"></div>
-      <button onclick="addTransaction()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">Add Transaction</button>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Notes (optional)</label><input id="f-tx-notes" type="text" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="Optional note..."></div>
+      <button onclick="saveTx()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Save Transaction</button>
     </div>
   </div>
 </div>
 
-<!-- ADD BUDGET MODAL -->
-<div id="add-budget-modal" class="modal-overlay" onclick="closeModalOutside(event,'add-budget-modal')">
-  <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
-    <div class="flex items-center justify-between mb-5">
-      <h3 class="font-bold text-gray-900 text-lg">Add Budget</h3>
-      <button onclick="closeModal('add-budget-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+<!-- Add/Edit Budget -->
+<div id="modal-add-budget" class="modal-overlay" onclick="outsideClose(event,'modal-add-budget')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-4">
+      <h3 id="budget-modal-title" class="font-bold text-gray-900">Add Budget</h3>
+      <button onclick="closeModal('modal-add-budget')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
     </div>
-    <div class="space-y-4">
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Category</label>
-        <select id="budget-cat" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold">
-          <option>Groceries</option><option>Food & Dining</option><option>Transportation</option>
-          <option>Entertainment</option><option>Shopping</option><option>Utilities</option>
-          <option>Healthcare</option><option>Fitness</option><option>Other</option>
+    <input type="hidden" id="budget-edit-id">
+    <div class="space-y-3">
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Category</label>
+        <select id="f-budget-cat" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+          <option>Groceries</option><option>Food & Dining</option><option>Transportation</option><option>Entertainment</option><option>Shopping</option><option>Utilities</option><option>Healthcare</option><option>Fitness</option><option>Other</option>
         </select></div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Budget Amount ($)</label>
-        <input id="budget-amount" type="number" step="1" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="0"></div>
-      <button onclick="addBudget()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">Save Budget</button>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Budget Amount ($)</label><input id="f-budget-amount" type="number" min="1" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="0"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Alert at (%)</label>
+        <select id="f-budget-alert" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+          <option value="70">70%</option><option value="80" selected>80%</option><option value="90">90%</option><option value="100">100%</option>
+        </select></div>
+      <button onclick="saveBudget()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Save Budget</button>
     </div>
   </div>
 </div>
 
-<!-- ADD SUBSCRIPTION MODAL -->
-<div id="add-sub-modal" class="modal-overlay" onclick="closeModalOutside(event,'add-sub-modal')">
-  <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
-    <div class="flex items-center justify-between mb-5">
-      <h3 class="font-bold text-gray-900 text-lg">Add Subscription</h3>
-      <button onclick="closeModal('add-sub-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+<!-- Add/Edit Subscription -->
+<div id="modal-add-sub" class="modal-overlay" onclick="outsideClose(event,'modal-add-sub')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-4">
+      <h3 id="sub-modal-title" class="font-bold text-gray-900">Add Subscription</h3>
+      <button onclick="closeModal('modal-add-sub')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
     </div>
-    <div class="space-y-4">
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Name</label>
-        <input id="sub-name" type="text" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="e.g. Netflix"></div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Amount ($)</label>
-        <input id="sub-amount" type="number" step="0.01" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="0.00"></div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Billing Cycle</label>
-        <select id="sub-cycle" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold">
-          <option value="Monthly">Monthly</option><option value="Yearly">Yearly</option>
+    <input type="hidden" id="sub-edit-id">
+    <div class="space-y-3">
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Name</label><input id="f-sub-name" type="text" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="e.g. Netflix"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Amount ($)</label><input id="f-sub-amount" type="number" step="0.01" min="0" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="0.00"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-gray-600 mb-1">Billing Cycle</label>
+          <select id="f-sub-cycle" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+            <option value="Monthly">Monthly</option><option value="Yearly">Yearly</option><option value="Weekly">Weekly</option>
+          </select></div>
+        <div><label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
+          <select id="f-sub-status" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+            <option value="Active">Active</option><option value="Paused">Paused</option><option value="Cancelled">Cancelled</option>
+          </select></div>
+      </div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Next Billing Date</label><input id="f-sub-date" type="date" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Category</label>
+        <select id="f-sub-cat" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+          <option>Entertainment</option><option>Music</option><option>Productivity</option><option>Cloud Storage</option><option>Shopping</option><option>Fitness</option><option>News</option><option>Other</option>
         </select></div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Next Billing Date</label>
-        <input id="sub-date" type="date" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm"></div>
-      <button onclick="addSubscription()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">Add Subscription</button>
+      <button onclick="saveSub()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Save Subscription</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User (Admin) -->
+<div id="modal-edit-user" class="modal-overlay" onclick="outsideClose(event,'modal-edit-user')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-4">
+      <h3 id="user-modal-title" class="font-bold text-gray-900">Edit User</h3>
+      <button onclick="closeModal('modal-edit-user')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+    </div>
+    <input type="hidden" id="user-edit-id">
+    <div class="space-y-3">
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Name</label><input id="f-user-name" type="text" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Email</label><input id="f-user-email" type="email" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Role</label>
+        <select id="f-user-role" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+          <option value="USER">User</option><option value="ADMIN">Admin</option><option value="VIEWER">Viewer (Read-only)</option>
+        </select></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
+        <select id="f-user-status" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+          <option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option>
+        </select></div>
+      <div class="bg-gray-50 rounded-xl p-3">
+        <p class="text-xs font-bold text-gray-700 mb-2">Feature Access</p>
+        <div class="space-y-2" id="user-perms"></div>
+      </div>
+      <button onclick="saveUser()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add User (Admin) -->
+<div id="modal-add-user" class="modal-overlay" onclick="outsideClose(event,'modal-add-user')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-bold text-gray-900">Add User</h3>
+      <button onclick="closeModal('modal-add-user')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+    </div>
+    <div class="space-y-3">
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Name</label><input id="f-new-name" type="text" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="Full name"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Email</label><input id="f-new-email" type="email" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="email@example.com"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Role</label>
+        <select id="f-new-role" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
+          <option value="USER">User</option><option value="ADMIN">Admin</option><option value="VIEWER">Viewer</option>
+        </select></div>
+      <button onclick="addUser()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Create User</button>
     </div>
   </div>
 </div>
 
 <script>
-const CAT_ICONS = {'Food & Dining':'🍽️','Groceries':'🛒','Transportation':'🚗','Entertainment':'🎬','Shopping':'🛍️','Healthcare':'💊','Utilities':'💡','Income':'💰','Fitness':'🏋️','Subscriptions':'📱','Other':'💳'};
-const CAT_COLORS = {'Food & Dining':'#f59e0b','Groceries':'#10b981','Transportation':'#3b82f6','Entertainment':'#8b5cf6','Shopping':'#ec4899','Healthcare':'#ef4444','Utilities':'#6b7280','Income':'#10b981','Fitness':'#7c3aed','Other':'#94a3b8'};
-const SUB_COLORS = ['#ef4444','#1db954','#ff0000','#007aff','#ff9900','#7c3aed','#0ea5e9','#f59e0b'];
-
-const DEFAULT_TX = [
-  {id:1,description:'Salary Deposit',amount:5500,type:'INCOME',category:'Income',date:'2026-04-01'},
-  {id:2,description:'Whole Foods Market',amount:124.50,type:'EXPENSE',category:'Groceries',date:'2026-04-02'},
-  {id:3,description:'Netflix Subscription',amount:15.99,type:'EXPENSE',category:'Entertainment',date:'2026-04-03'},
-  {id:4,description:'Chipotle',amount:18.50,type:'EXPENSE',category:'Food & Dining',date:'2026-04-03'},
-  {id:5,description:'Uber Ride',amount:24.00,type:'EXPENSE',category:'Transportation',date:'2026-04-04'},
-  {id:6,description:'Spotify Premium',amount:9.99,type:'EXPENSE',category:'Entertainment',date:'2026-04-05'},
-  {id:7,description:'Amazon Purchase',amount:67.23,type:'EXPENSE',category:'Shopping',date:'2026-04-06'},
-  {id:8,description:'Electric Bill',amount:89.00,type:'EXPENSE',category:'Utilities',date:'2026-04-07'},
-  {id:9,description:'Gym Membership',amount:45.00,type:'EXPENSE',category:'Fitness',date:'2026-04-07'},
-  {id:10,description:'Freelance Payment',amount:850,type:'INCOME',category:'Income',date:'2026-04-08'},
-  {id:11,description:'CVS Pharmacy',amount:32.15,type:'EXPENSE',category:'Healthcare',date:'2026-04-08'},
-  {id:12,description:'Starbucks',amount:6.75,type:'EXPENSE',category:'Food & Dining',date:'2026-04-09'},
-];
-const DEFAULT_BUDGETS = [
-  {id:1,category:'Groceries',amount:400},
-  {id:2,category:'Food & Dining',amount:300},
-  {id:3,category:'Transportation',amount:200},
-  {id:4,category:'Entertainment',amount:100},
-  {id:5,category:'Shopping',amount:250},
-  {id:6,category:'Utilities',amount:150},
-  {id:7,category:'Fitness',amount:60},
-];
-const DEFAULT_SUBS = [
-  {id:1,name:'Netflix',amount:15.99,cycle:'Monthly',nextDate:'2026-05-03',color:'#ef4444'},
-  {id:2,name:'Spotify',amount:9.99,cycle:'Monthly',nextDate:'2026-05-05',color:'#1db954'},
-  {id:3,name:'Adobe Creative Cloud',amount:54.99,cycle:'Monthly',nextDate:'2026-04-15',color:'#ff0000'},
-  {id:4,name:'iCloud Storage',amount:2.99,cycle:'Monthly',nextDate:'2026-04-20',color:'#007aff'},
-  {id:5,name:'Amazon Prime',amount:139,cycle:'Yearly',nextDate:'2027-01-01',color:'#ff9900'},
-  {id:6,name:'Planet Fitness',amount:25.00,cycle:'Monthly',nextDate:'2026-04-17',color:'#7c3aed'},
+// ===================== DATA =====================
+const ACCOUNTS = {
+  'demo@fintrack.app':  {password:'Demo123!',role:'USER'},
+  'admin@fintrack.app': {password:'Admin123!',role:'ADMIN'},
+};
+const CAT_ICONS={'Food & Dining':'🍽️','Groceries':'🛒','Transportation':'🚗','Entertainment':'🎬','Shopping':'🛍️','Healthcare':'💊','Utilities':'💡','Income':'💰','Fitness':'🏋️','Subscriptions':'📱','Other':'💳'};
+const CAT_COLORS={'Food & Dining':'#f59e0b','Groceries':'#10b981','Transportation':'#3b82f6','Entertainment':'#8b5cf6','Shopping':'#ec4899','Healthcare':'#ef4444','Utilities':'#6b7280','Income':'#10b981','Fitness':'#7c3aed','Other':'#94a3b8'};
+const SUB_COLORS=['#ef4444','#1db954','#ff0000','#007aff','#ff9900','#7c3aed','#0ea5e9','#f59e0b'];
+const PERMISSIONS=[
+  {key:'view_dashboard',label:'View Dashboard'},
+  {key:'manage_transactions',label:'Manage Transactions'},
+  {key:'manage_budgets',label:'Manage Budgets'},
+  {key:'manage_subscriptions',label:'Manage Subscriptions'},
+  {key:'view_reports',label:'View Reports'},
+  {key:'manage_users',label:'Manage Users'},
+  {key:'admin_panel',label:'Admin Panel'},
 ];
 
-function getData(key, def) {
-  try { const v = localStorage.getItem('ft_'+key); return v ? JSON.parse(v) : def; } catch { return def; }
-}
-function saveData(key, val) { localStorage.setItem('ft_'+key, JSON.stringify(val)); }
+function ld(k,d){try{const v=localStorage.getItem('ft_'+k);return v?JSON.parse(v):d;}catch{return d;}}
+function sv(k,v){localStorage.setItem('ft_'+k,JSON.stringify(v));}
+const fmt=n=>'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const initials=n=>n?n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2):'?';
 
-let transactions = getData('tx', DEFAULT_TX);
-let budgets = getData('budgets', DEFAULT_BUDGETS);
-let subscriptions = getData('subs', DEFAULT_SUBS);
+let transactions=ld('tx',[
+  {id:1,description:'Salary Deposit',amount:5500,type:'INCOME',category:'Income',date:'2026-04-01',notes:''},
+  {id:2,description:'Whole Foods Market',amount:124.50,type:'EXPENSE',category:'Groceries',date:'2026-04-02',notes:''},
+  {id:3,description:'Netflix',amount:15.99,type:'EXPENSE',category:'Entertainment',date:'2026-04-03',notes:''},
+  {id:4,description:'Chipotle',amount:18.50,type:'EXPENSE',category:'Food & Dining',date:'2026-04-03',notes:''},
+  {id:5,description:'Uber',amount:24.00,type:'EXPENSE',category:'Transportation',date:'2026-04-04',notes:''},
+  {id:6,description:'Spotify',amount:9.99,type:'EXPENSE',category:'Entertainment',date:'2026-04-05',notes:''},
+  {id:7,description:'Amazon',amount:67.23,type:'EXPENSE',category:'Shopping',date:'2026-04-06',notes:''},
+  {id:8,description:'Electric Bill',amount:89.00,type:'EXPENSE',category:'Utilities',date:'2026-04-07',notes:''},
+  {id:9,description:'Planet Fitness',amount:45.00,type:'EXPENSE',category:'Fitness',date:'2026-04-07',notes:''},
+  {id:10,description:'Freelance',amount:850,type:'INCOME',category:'Income',date:'2026-04-08',notes:''},
+  {id:11,description:'CVS Pharmacy',amount:32.15,type:'EXPENSE',category:'Healthcare',date:'2026-04-08',notes:''},
+  {id:12,description:'Starbucks',amount:6.75,type:'EXPENSE',category:'Food & Dining',date:'2026-04-09',notes:''},
+]);
+let budgets=ld('budgets',[
+  {id:1,category:'Groceries',amount:400,alert:80},
+  {id:2,category:'Food & Dining',amount:300,alert:80},
+  {id:3,category:'Transportation',amount:200,alert:80},
+  {id:4,category:'Entertainment',amount:100,alert:80},
+  {id:5,category:'Shopping',amount:250,alert:80},
+  {id:6,category:'Utilities',amount:150,alert:80},
+  {id:7,category:'Fitness',amount:60,alert:80},
+]);
+let subscriptions=ld('subs',[
+  {id:1,name:'Netflix',amount:15.99,cycle:'Monthly',nextDate:'2026-05-03',status:'Active',category:'Entertainment',color:'#ef4444'},
+  {id:2,name:'Spotify',amount:9.99,cycle:'Monthly',nextDate:'2026-05-05',status:'Active',category:'Music',color:'#1db954'},
+  {id:3,name:'Adobe CC',amount:54.99,cycle:'Monthly',nextDate:'2026-04-15',status:'Active',category:'Productivity',color:'#ff0000'},
+  {id:4,name:'iCloud',amount:2.99,cycle:'Monthly',nextDate:'2026-04-20',status:'Active',category:'Cloud Storage',color:'#007aff'},
+  {id:5,name:'Amazon Prime',amount:139,cycle:'Yearly',nextDate:'2027-01-01',status:'Active',category:'Shopping',color:'#ff9900'},
+  {id:6,name:'Planet Fitness',amount:25.00,cycle:'Monthly',nextDate:'2026-04-17',status:'Active',category:'Fitness',color:'#7c3aed'},
+]);
+let users=ld('users',[
+  {id:1,name:'Alex Johnson',email:'demo@fintrack.app',role:'USER',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:false,admin_panel:false}},
+  {id:2,name:'Admin User',email:'admin@fintrack.app',role:'ADMIN',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:true,admin_panel:true}},
+  {id:3,name:'Jane Smith',email:'jane@fintrack.app',role:'USER',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:false,admin_panel:false}},
+  {id:4,name:'Bob Wilson',email:'bob@fintrack.app',role:'VIEWER',status:'inactive',perms:{view_dashboard:true,manage_transactions:false,manage_budgets:false,manage_subscriptions:false,view_reports:true,manage_users:false,admin_panel:false}},
+]);
 
-const fmt = n => '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+let currentUser=null;
 
-function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value;
-  const err = document.getElementById('login-error');
-  if (email === 'demo@fintrack.app' && pass === 'Demo123!') {
-    localStorage.setItem('ft_auth','1');
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
+// ===================== AUTH =====================
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pass=document.getElementById('login-password').value;
+  const err=document.getElementById('login-error');
+  const acc=ACCOUNTS[email];
+  if(acc && acc.password===pass){
+    const u=users.find(x=>x.email===email);
+    if(u && u.status==='inactive'){err.textContent='Account is inactive. Contact admin.';err.classList.remove('hidden');return;}
+    currentUser={email,role:acc.role,name:u?u.name:'User'};
+    sv('auth',currentUser);
+    err.classList.add('hidden');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
     initApp();
   } else {
-    err.textContent = 'Invalid email or password. Use demo@fintrack.app / Demo123!';
+    err.textContent='Invalid email or password.';
     err.classList.remove('hidden');
   }
 }
+function doLogout(){sv('auth',null);currentUser=null;document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='block';}
 
-function doLogout() {
-  localStorage.removeItem('ft_auth');
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'block';
+// ===================== NAV =====================
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>{b.classList.toggle('active',b.dataset.page===name);});
+  document.querySelectorAll('.bn').forEach(b=>{b.classList.toggle('active',b.dataset.page===name);});
+  if(name==='transactions')renderTx();
+  if(name==='budgets')renderBudgets();
+  if(name==='subscriptions')renderSubs();
+  if(name==='admin')renderAdmin();
 }
-
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(b => {
-    b.classList.toggle('active', b.dataset.page === name);
-    b.style.color = b.dataset.page === name ? '#4f46e5' : '';
+function switchDashTab(tab){
+  ['recent','upcoming','insights'].forEach(t=>{
+    document.getElementById('dash-tab-'+t).classList.toggle('hidden',t!==tab);
+    document.getElementById('dt-'+t).classList.toggle('active',t===tab);
   });
-  document.querySelectorAll('.bn-btn').forEach(b => {
-    const isActive = b.dataset.page === name;
-    b.style.color = isActive ? '#4f46e5' : '#9ca3af';
-  });
-  if (name === 'transactions') renderTransactions();
-  if (name === 'budgets') renderBudgets();
-  if (name === 'subscriptions') renderSubscriptions();
 }
 
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-  if (id === 'add-tx-modal') document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
-  if (id === 'add-sub-modal') document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
-}
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function closeModalOutside(e, id) { if (e.target.id === id) closeModal(id); }
+// ===================== MODAL =====================
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function outsideClose(e,id){if(e.target.id===id)closeModal(id);}
 
-function addTransaction() {
-  const desc = document.getElementById('tx-desc').value.trim();
-  const amount = parseFloat(document.getElementById('tx-amount').value);
-  const type = document.getElementById('tx-type').value;
-  const category = document.getElementById('tx-cat').value;
-  const date = document.getElementById('tx-date').value;
-  if (!desc || !amount || !date) return alert('Please fill all fields');
-  transactions.unshift({id: Date.now(), description: desc, amount, type, category, date});
-  saveData('tx', transactions);
-  closeModal('add-tx-modal');
-  renderTransactions();
-  updateDashboardSummary();
-  document.getElementById('tx-desc').value = '';
-  document.getElementById('tx-amount').value = '';
+// ===================== TRANSACTIONS =====================
+function openAddTx(){
+  document.getElementById('tx-modal-title').textContent='Add Transaction';
+  document.getElementById('tx-edit-id').value='';
+  document.getElementById('f-tx-desc').value='';
+  document.getElementById('f-tx-amount').value='';
+  document.getElementById('f-tx-type').value='EXPENSE';
+  document.getElementById('f-tx-cat').value='Food & Dining';
+  document.getElementById('f-tx-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-tx-notes').value='';
+  openModal('modal-add-tx');
 }
-
-function deleteTransaction(id) {
-  if (!confirm('Delete this transaction?')) return;
-  transactions = transactions.filter(t => t.id !== id);
-  saveData('tx', transactions);
-  renderTransactions();
-  updateDashboardSummary();
+function openEditTx(id){
+  const t=transactions.find(x=>x.id===id);if(!t)return;
+  document.getElementById('tx-modal-title').textContent='Edit Transaction';
+  document.getElementById('tx-edit-id').value=id;
+  document.getElementById('f-tx-desc').value=t.description;
+  document.getElementById('f-tx-amount').value=t.amount;
+  document.getElementById('f-tx-type').value=t.type;
+  document.getElementById('f-tx-cat').value=t.category;
+  document.getElementById('f-tx-date').value=t.date;
+  document.getElementById('f-tx-notes').value=t.notes||'';
+  openModal('modal-add-tx');
 }
-
-function addBudget() {
-  const category = document.getElementById('budget-cat').value;
-  const amount = parseFloat(document.getElementById('budget-amount').value);
-  if (!amount) return alert('Please enter an amount');
-  const existing = budgets.findIndex(b => b.category === category);
-  if (existing >= 0) budgets[existing].amount = amount;
-  else budgets.push({id: Date.now(), category, amount});
-  saveData('budgets', budgets);
-  closeModal('add-budget-modal');
-  renderBudgets();
-  document.getElementById('budget-amount').value = '';
+function saveTx(){
+  const desc=document.getElementById('f-tx-desc').value.trim();
+  const amount=parseFloat(document.getElementById('f-tx-amount').value);
+  const type=document.getElementById('f-tx-type').value;
+  const cat=document.getElementById('f-tx-cat').value;
+  const date=document.getElementById('f-tx-date').value;
+  const notes=document.getElementById('f-tx-notes').value.trim();
+  const editId=document.getElementById('tx-edit-id').value;
+  if(!desc||!amount||!date){alert('Please fill all required fields.');return;}
+  if(editId){
+    const i=transactions.findIndex(x=>x.id==editId);
+    if(i>=0)transactions[i]={...transactions[i],description:desc,amount,type,category:cat,date,notes};
+  } else {
+    transactions.unshift({id:Date.now(),description:desc,amount,type,category:cat,date,notes});
+  }
+  sv('tx',transactions);closeModal('modal-add-tx');renderTx();updateDashboard();
 }
-
-function deleteBudget(id) {
-  budgets = budgets.filter(b => b.id !== id);
-  saveData('budgets', budgets);
-  renderBudgets();
-}
-
-function addSubscription() {
-  const name = document.getElementById('sub-name').value.trim();
-  const amount = parseFloat(document.getElementById('sub-amount').value);
-  const cycle = document.getElementById('sub-cycle').value;
-  const nextDate = document.getElementById('sub-date').value;
-  if (!name || !amount || !nextDate) return alert('Please fill all fields');
-  subscriptions.push({id: Date.now(), name, amount, cycle, nextDate, color: SUB_COLORS[subscriptions.length % SUB_COLORS.length]});
-  saveData('subs', subscriptions);
-  closeModal('add-sub-modal');
-  renderSubscriptions();
-  document.getElementById('sub-name').value = '';
-  document.getElementById('sub-amount').value = '';
-}
-
-function deleteSubscription(id) {
-  subscriptions = subscriptions.filter(s => s.id !== id);
-  saveData('subs', subscriptions);
-  renderSubscriptions();
-}
-
-function renderTransactions() {
-  const search = (document.getElementById('tx-search')?.value || '').toLowerCase();
-  const filter = document.getElementById('tx-filter')?.value || '';
-  const filtered = transactions.filter(t =>
-    (!search || t.description.toLowerCase().includes(search) || t.category.toLowerCase().includes(search)) &&
-    (!filter || t.type === filter)
-  );
-  const el = document.getElementById('tx-list');
-  if (!filtered.length) { el.innerHTML = '<div class="card p-8 text-center text-gray-400">No transactions found</div>'; return; }
-  el.innerHTML = filtered.map(t => `
-    <div class="card p-4 flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-xl flex-shrink-0">${CAT_ICONS[t.category]||'💳'}</div>
+function deleteTx(id){if(!confirm('Delete this transaction?'))return;transactions=transactions.filter(x=>x.id!==id);sv('tx',transactions);renderTx();updateDashboard();}
+function renderTx(){
+  const search=(document.getElementById('tx-search')?.value||'').toLowerCase();
+  const filter=document.getElementById('tx-filter')?.value||'';
+  const list=transactions.filter(t=>(!search||t.description.toLowerCase().includes(search)||t.category.toLowerCase().includes(search))&&(!filter||t.type===filter));
+  const el=document.getElementById('tx-list');
+  el.innerHTML=list.length?list.map(t=>`
+    <div class="card p-3 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-lg flex-shrink-0">${CAT_ICONS[t.category]||'💳'}</div>
       <div class="flex-1 min-w-0">
         <p class="font-semibold text-gray-900 text-sm truncate">${t.description}</p>
-        <p class="text-gray-400 text-xs mt-0.5">${t.category} · ${new Date(t.date).toLocaleDateString()}</p>
+        <p class="text-gray-400 text-xs mt-0.5">${t.category} · ${new Date(t.date).toLocaleDateString()}${t.notes?' · '+t.notes:''}</p>
       </div>
-      <div class="flex items-center gap-3">
-        <span class="font-bold text-sm ${t.type==='INCOME'?'text-green-600':'text-red-500'}">${t.type==='INCOME'?'+':'-'}${fmt(t.amount)}</span>
-        <button onclick="deleteTransaction(${t.id})" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
+      <span class="font-bold text-sm ${t.type==='INCOME'?'text-green-600':'text-red-500'} mr-1">${t.type==='INCOME'?'+':'-'}${fmt(t.amount)}</span>
+      <div class="flex gap-1">
+        <button class="action-btn edit-btn" onclick="openEditTx(${t.id})"><i class="fa-solid fa-pen"></i></button>
+        <button class="action-btn del-btn" onclick="deleteTx(${t.id})"><i class="fa-solid fa-trash"></i></button>
       </div>
-    </div>`).join('');
+    </div>`).join(''):'<div class="card p-8 text-center text-gray-400 text-sm">No transactions found.</div>';
 }
 
-function renderBudgets() {
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
-  const monthTx = transactions.filter(t => {
-    const d = new Date(t.date);
-    return t.type === 'EXPENSE' && d.getMonth()+1 === month && d.getFullYear() === year;
-  });
-
-  let totalBudgeted = 0, totalSpent = 0;
-  const el = document.getElementById('budget-list');
-  el.innerHTML = budgets.map(b => {
-    const spent = monthTx.filter(t => t.category === b.category).reduce((s,t) => s+t.amount, 0);
-    const pct = Math.min(100, Math.round((spent/b.amount)*100));
-    const remaining = b.amount - spent;
-    totalBudgeted += b.amount;
-    totalSpent += spent;
-    const color = pct >= 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
-    return `<div class="card p-5">
-      <div class="flex items-center justify-between mb-3">
+// ===================== BUDGETS =====================
+function openAddBudget(){
+  document.getElementById('budget-modal-title').textContent='Add Budget';
+  document.getElementById('budget-edit-id').value='';
+  document.getElementById('f-budget-cat').value='Groceries';
+  document.getElementById('f-budget-amount').value='';
+  document.getElementById('f-budget-alert').value='80';
+  openModal('modal-add-budget');
+}
+function openEditBudget(id){
+  const b=budgets.find(x=>x.id===id);if(!b)return;
+  document.getElementById('budget-modal-title').textContent='Edit Budget';
+  document.getElementById('budget-edit-id').value=id;
+  document.getElementById('f-budget-cat').value=b.category;
+  document.getElementById('f-budget-amount').value=b.amount;
+  document.getElementById('f-budget-alert').value=b.alert||80;
+  openModal('modal-add-budget');
+}
+function saveBudget(){
+  const cat=document.getElementById('f-budget-cat').value;
+  const amount=parseFloat(document.getElementById('f-budget-amount').value);
+  const alert=parseInt(document.getElementById('f-budget-alert').value);
+  const editId=document.getElementById('budget-edit-id').value;
+  if(!amount){alert('Enter a budget amount.');return;}
+  if(editId){
+    const i=budgets.findIndex(x=>x.id==editId);
+    if(i>=0)budgets[i]={...budgets[i],category:cat,amount,alert};
+  } else {
+    const ex=budgets.findIndex(b=>b.category===cat);
+    if(ex>=0)budgets[ex]={...budgets[ex],amount,alert};
+    else budgets.push({id:Date.now(),category:cat,amount,alert});
+  }
+  sv('budgets',budgets);closeModal('modal-add-budget');renderBudgets();
+}
+function deleteBudget(id){if(!confirm('Delete this budget?'))return;budgets=budgets.filter(x=>x.id!==id);sv('budgets',budgets);renderBudgets();}
+function renderBudgets(){
+  const now=new Date();const m=now.getMonth()+1;const y=now.getFullYear();
+  const monthTx=transactions.filter(t=>{const d=new Date(t.date);return t.type==='EXPENSE'&&d.getMonth()+1===m&&d.getFullYear()===y;});
+  let tb=0,ts=0;
+  const el=document.getElementById('budget-list');
+  el.innerHTML=budgets.map(b=>{
+    const spent=monthTx.filter(t=>t.category===b.category).reduce((s,t)=>s+t.amount,0);
+    const pct=Math.min(100,Math.round((spent/b.amount)*100));
+    const color=pct>=100?'#ef4444':pct>=(b.alert||80)?'#f59e0b':'#10b981';
+    tb+=b.amount;ts+=spent;
+    return `<div class="card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2"><span class="text-lg">${CAT_ICONS[b.category]||'💳'}</span><span class="font-bold text-gray-900 text-sm">${b.category}</span>${pct>=(b.alert||80)?'<span class="badge bg-amber-100 text-amber-700">⚠ Alert</span>':''}</div>
         <div class="flex items-center gap-2">
-          <span class="text-xl">${CAT_ICONS[b.category]||'💳'}</span>
-          <span class="font-bold text-gray-900">${b.category}</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="text-sm font-semibold text-gray-500">${fmt(spent)} / ${fmt(b.amount)}</span>
-          <button onclick="deleteBudget(${b.id})" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
+          <span class="text-xs font-semibold text-gray-500">${fmt(spent)}/${fmt(b.amount)}</span>
+          <button class="action-btn edit-btn" onclick="openEditBudget(${b.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="action-btn del-btn" onclick="deleteBudget(${b.id})"><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>
-      <div class="bg-gray-100 rounded-full h-3 overflow-hidden">
-        <div class="h-3 rounded-full progress-bar" style="width:${pct}%;background:${color}"></div>
-      </div>
-      <div class="flex justify-between mt-2">
-        <span class="text-xs font-semibold" style="color:${color}">${pct}% used</span>
-        <span class="text-xs text-gray-400">${remaining >= 0 ? fmt(remaining)+' left' : fmt(Math.abs(remaining))+' over'}</span>
-      </div>
+      <div class="bg-gray-100 rounded-full h-2.5 overflow-hidden"><div class="h-2.5 rounded-full progress-bar" style="width:${pct}%;background:${color}"></div></div>
+      <div class="flex justify-between mt-1.5"><span class="text-xs font-semibold" style="color:${color}">${pct}% used</span><span class="text-xs text-gray-400">${b.amount-spent>=0?fmt(b.amount-spent)+' left':fmt(Math.abs(b.amount-spent))+' over'}</span></div>
     </div>`;
-  }).join('') || '<div class="card p-8 text-center text-gray-400">No budgets set. Add one to get started!</div>';
-
-  document.getElementById('total-budgeted').textContent = fmt(totalBudgeted);
-  document.getElementById('total-budget-spent').textContent = fmt(totalSpent);
-  document.getElementById('total-remaining').textContent = fmt(Math.max(0, totalBudgeted - totalSpent));
+  }).join('')||'<div class="card p-8 text-center text-gray-400 text-sm">No budgets set.</div>';
+  document.getElementById('b-total').textContent=fmt(tb);
+  document.getElementById('b-spent').textContent=fmt(ts);
+  document.getElementById('b-left').textContent=fmt(Math.max(0,tb-ts));
 }
 
-function renderSubscriptions() {
-  let monthly = 0, yearly = 0;
-  subscriptions.forEach(s => {
-    if (s.cycle === 'Monthly') { monthly += s.amount; yearly += s.amount * 12; }
-    else { yearly += s.amount; monthly += s.amount / 12; }
-  });
-  document.getElementById('sub-monthly').textContent = fmt(monthly);
-  document.getElementById('sub-yearly').textContent = fmt(yearly);
-
-  const el = document.getElementById('sub-list');
-  el.innerHTML = subscriptions.map(s => {
-    const days = Math.ceil((new Date(s.nextDate) - new Date()) / 86400000);
-    const urgent = days <= 7;
-    return `<div class="card p-4 flex items-center gap-3">
+// ===================== SUBSCRIPTIONS =====================
+function openAddSub(){
+  document.getElementById('sub-modal-title').textContent='Add Subscription';
+  document.getElementById('sub-edit-id').value='';
+  ['f-sub-name','f-sub-amount'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-sub-cycle').value='Monthly';
+  document.getElementById('f-sub-status').value='Active';
+  document.getElementById('f-sub-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-sub-cat').value='Entertainment';
+  openModal('modal-add-sub');
+}
+function openEditSub(id){
+  const s=subscriptions.find(x=>x.id===id);if(!s)return;
+  document.getElementById('sub-modal-title').textContent='Edit Subscription';
+  document.getElementById('sub-edit-id').value=id;
+  document.getElementById('f-sub-name').value=s.name;
+  document.getElementById('f-sub-amount').value=s.amount;
+  document.getElementById('f-sub-cycle').value=s.cycle;
+  document.getElementById('f-sub-status').value=s.status||'Active';
+  document.getElementById('f-sub-date').value=s.nextDate;
+  document.getElementById('f-sub-cat').value=s.category||'Entertainment';
+  openModal('modal-add-sub');
+}
+function saveSub(){
+  const name=document.getElementById('f-sub-name').value.trim();
+  const amount=parseFloat(document.getElementById('f-sub-amount').value);
+  const cycle=document.getElementById('f-sub-cycle').value;
+  const status=document.getElementById('f-sub-status').value;
+  const nextDate=document.getElementById('f-sub-date').value;
+  const category=document.getElementById('f-sub-cat').value;
+  const editId=document.getElementById('sub-edit-id').value;
+  if(!name||!amount||!nextDate){alert('Please fill all required fields.');return;}
+  if(editId){
+    const i=subscriptions.findIndex(x=>x.id==editId);
+    if(i>=0)subscriptions[i]={...subscriptions[i],name,amount,cycle,status,nextDate,category};
+  } else {
+    subscriptions.push({id:Date.now(),name,amount,cycle,status,nextDate,category,color:SUB_COLORS[subscriptions.length%SUB_COLORS.length]});
+  }
+  sv('subs',subscriptions);closeModal('modal-add-sub');renderSubs();
+}
+function deleteSub(id){if(!confirm('Delete this subscription?'))return;subscriptions=subscriptions.filter(x=>x.id!==id);sv('subs',subscriptions);renderSubs();}
+function renderSubs(){
+  let monthly=0,yearly=0;
+  subscriptions.forEach(s=>{if(s.status==='Active'||!s.status){if(s.cycle==='Monthly'){monthly+=s.amount;yearly+=s.amount*12;}else if(s.cycle==='Yearly'){yearly+=s.amount;monthly+=s.amount/12;}else if(s.cycle==='Weekly'){monthly+=s.amount*4.33;yearly+=s.amount*52;}}});
+  document.getElementById('sub-monthly').textContent=fmt(monthly);
+  document.getElementById('sub-yearly').textContent=fmt(yearly);
+  const el=document.getElementById('sub-list');
+  el.innerHTML=subscriptions.map(s=>{
+    const days=Math.ceil((new Date(s.nextDate)-new Date())/86400000);
+    const statusColor=s.status==='Active'?'bg-green-100 text-green-700':s.status==='Paused'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-500';
+    return `<div class="card p-3 flex items-center gap-3">
       <div class="w-3 h-10 rounded-full flex-shrink-0" style="background:${s.color}"></div>
       <div class="flex-1 min-w-0">
-        <p class="font-bold text-gray-900">${s.name}</p>
-        <p class="text-gray-400 text-xs mt-0.5">${s.cycle} · Next: ${new Date(s.nextDate).toLocaleDateString()}</p>
-        ${urgent ? `<span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded-full">Due in ${days}d</span>` : ''}
+        <div class="flex items-center gap-2"><p class="font-bold text-gray-900 text-sm">${s.name}</p><span class="badge ${statusColor}">${s.status||'Active'}</span></div>
+        <p class="text-gray-400 text-xs mt-0.5">${s.cycle} · ${s.category||''} · ${new Date(s.nextDate).toLocaleDateString()}${days>=0&&days<=7?' <span class="text-red-500 font-semibold">Due in '+days+'d</span>':''}</p>
       </div>
-      <div class="flex items-center gap-3">
-        <span class="font-bold text-gray-900">${fmt(s.amount)}</span>
-        <button onclick="deleteSubscription(${s.id})" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
+      <span class="font-bold text-gray-900 text-sm mr-1">${fmt(s.amount)}</span>
+      <div class="flex gap-1">
+        <button class="action-btn edit-btn" onclick="openEditSub(${s.id})"><i class="fa-solid fa-pen"></i></button>
+        <button class="action-btn del-btn" onclick="deleteSub(${s.id})"><i class="fa-solid fa-trash"></i></button>
       </div>
     </div>`;
-  }).join('') || '<div class="card p-8 text-center text-gray-400">No subscriptions. Add one!</div>';
+  }).join('')||'<div class="card p-8 text-center text-gray-400 text-sm">No subscriptions.</div>';
 }
 
-function updateDashboardSummary() {
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
-  const monthTx = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getMonth()+1 === month && d.getFullYear() === year;
-  });
-  const income = monthTx.filter(t=>t.type==='INCOME').reduce((s,t)=>s+t.amount,0);
-  const expenses = monthTx.filter(t=>t.type==='EXPENSE').reduce((s,t)=>s+t.amount,0);
-  const net = income - expenses;
-  const rate = income > 0 ? Math.round((net/income)*100) : 0;
-  document.getElementById('net-savings').textContent = fmt(net);
-  document.getElementById('total-income').textContent = fmt(income);
-  document.getElementById('total-expenses').textContent = fmt(expenses);
-  document.getElementById('savings-rate').textContent = rate + '%';
+// ===================== ADMIN =====================
+function renderAdmin(){
+  const total=users.length;
+  const admins=users.filter(u=>u.role==='ADMIN').length;
+  const active=users.filter(u=>u.status==='active').length;
+  document.getElementById('admin-total').textContent=total;
+  document.getElementById('admin-admins').textContent=admins;
+  document.getElementById('admin-active').textContent=active;
+  document.getElementById('admin-inactive').textContent=total-active;
 
-  // Recent transactions
-  const recentEl = document.getElementById('recent-tx');
-  recentEl.innerHTML = transactions.slice(0,5).map(t => `
+  // Permissions table
+  const pt=document.getElementById('perm-table');
+  pt.innerHTML=PERMISSIONS.map(p=>`<tr>
+    <td class="py-2 pr-4 text-gray-700">${p.label}</td>
+    <td class="text-center py-2 px-4">${['manage_users','admin_panel'].includes(p.key)?'<span class="text-gray-300">✗</span>':'<span class="text-green-500">✓</span>'}</td>
+    <td class="text-center py-2 px-4"><span class="text-green-500">✓</span></td>
+  </tr>`).join('');
+
+  // User table
+  const ut=document.getElementById('user-table');
+  ut.innerHTML=users.map(u=>{
+    const roleBadge=u.role==='ADMIN'?'badge-admin':u.role==='VIEWER'?'badge-inactive':'badge-user';
+    const statusBadge=u.status==='active'?'bg-green-100 text-green-700':u.status==='suspended'?'bg-red-100 text-red-700':'badge-inactive';
+    return `<tr class="hover:bg-gray-50">
+      <td class="py-3 pr-4">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 text-xs font-bold">${initials(u.name)}</div>
+          <div><p class="font-semibold text-gray-900 text-sm">${u.name}</p><p class="text-gray-400 text-xs">${u.email}</p></div>
+        </div>
+      </td>
+      <td class="py-3 pr-4"><span class="badge ${roleBadge}">${u.role}</span></td>
+      <td class="py-3 pr-4"><span class="badge ${statusBadge}">${u.status}</span></td>
+      <td class="py-3 text-right">
+        <div class="flex gap-1 justify-end">
+          <button class="action-btn edit-btn" onclick="openEditUser(${u.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="action-btn del-btn" onclick="deleteUser(${u.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openEditUser(id){
+  const u=users.find(x=>x.id===id);if(!u)return;
+  document.getElementById('user-modal-title').textContent='Edit User — '+u.name;
+  document.getElementById('user-edit-id').value=id;
+  document.getElementById('f-user-name').value=u.name;
+  document.getElementById('f-user-email').value=u.email;
+  document.getElementById('f-user-role').value=u.role;
+  document.getElementById('f-user-status').value=u.status;
+  const permsEl=document.getElementById('user-perms');
+  permsEl.innerHTML=PERMISSIONS.map(p=>`
+    <label class="flex items-center gap-2 cursor-pointer">
+      <input type="checkbox" id="perm-${p.key}" ${u.perms?.[p.key]?'checked':''} class="w-4 h-4 text-indigo-600 rounded">
+      <span class="text-xs text-gray-700">${p.label}</span>
+    </label>`).join('');
+  openModal('modal-edit-user');
+}
+function saveUser(){
+  const id=document.getElementById('user-edit-id').value;
+  const i=users.findIndex(x=>x.id==id);if(i<0)return;
+  const perms={};
+  PERMISSIONS.forEach(p=>{perms[p.key]=document.getElementById('perm-'+p.key)?.checked||false;});
+  users[i]={...users[i],name:document.getElementById('f-user-name').value,email:document.getElementById('f-user-email').value,role:document.getElementById('f-user-role').value,status:document.getElementById('f-user-status').value,perms};
+  sv('users',users);closeModal('modal-edit-user');renderAdmin();
+}
+function addUser(){
+  const name=document.getElementById('f-new-name').value.trim();
+  const email=document.getElementById('f-new-email').value.trim();
+  const role=document.getElementById('f-new-role').value;
+  if(!name||!email){alert('Please fill all fields.');return;}
+  const isAdmin=role==='ADMIN';
+  users.push({id:Date.now(),name,email,role,status:'active',perms:{view_dashboard:true,manage_transactions:role!=='VIEWER',manage_budgets:role!=='VIEWER',manage_subscriptions:role!=='VIEWER',view_reports:true,manage_users:isAdmin,admin_panel:isAdmin}});
+  sv('users',users);closeModal('modal-add-user');renderAdmin();
+  document.getElementById('f-new-name').value='';document.getElementById('f-new-email').value='';
+}
+function deleteUser(id){
+  const u=users.find(x=>x.id===id);
+  if(u&&(u.email==='admin@fintrack.app'||u.email==='demo@fintrack.app')){alert('Cannot delete built-in accounts.');return;}
+  if(!confirm('Delete this user?'))return;
+  users=users.filter(x=>x.id!==id);sv('users',users);renderAdmin();
+}
+
+// ===================== DASHBOARD =====================
+let tChart,pChart;
+function updateDashboard(){
+  const now=new Date();const m=now.getMonth()+1;const y=now.getFullYear();
+  const mTx=transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()+1===m&&d.getFullYear()===y;});
+  const income=mTx.filter(t=>t.type==='INCOME').reduce((s,t)=>s+t.amount,0);
+  const expenses=mTx.filter(t=>t.type==='EXPENSE').reduce((s,t)=>s+t.amount,0);
+  const net=income-expenses;
+  const rate=income>0?Math.round((net/income)*100):0;
+  document.getElementById('net-savings').textContent=fmt(net);
+  document.getElementById('total-income').textContent=fmt(income);
+  document.getElementById('total-expenses').textContent=fmt(expenses);
+  document.getElementById('savings-rate').textContent=rate+'%';
+
+  // Recent
+  document.getElementById('dash-tab-recent').innerHTML=transactions.slice(0,6).map(t=>`
     <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-sm flex-shrink-0">${CAT_ICONS[t.category]||'💳'}</div>
+      <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-base flex-shrink-0">${CAT_ICONS[t.category]||'💳'}</div>
       <div class="flex-1 min-w-0"><p class="text-sm font-semibold text-gray-800 truncate">${t.description}</p><p class="text-xs text-gray-400">${t.category}</p></div>
       <span class="text-sm font-bold ${t.type==='INCOME'?'text-green-600':'text-red-500'}">${t.type==='INCOME'?'+':'-'}${fmt(t.amount)}</span>
     </div>`).join('');
 
-  // Upcoming subscriptions
-  const upEl = document.getElementById('upcoming-subs');
-  const upcoming = subscriptions.filter(s => {
-    const days = (new Date(s.nextDate) - new Date()) / 86400000;
-    return days >= 0 && days <= 14;
-  }).slice(0,4);
-  upEl.innerHTML = upcoming.length ? upcoming.map(s => `
+  // Upcoming
+  const upcoming=subscriptions.filter(s=>{const d=(new Date(s.nextDate)-new Date())/86400000;return d>=0&&d<=14;});
+  document.getElementById('dash-tab-upcoming').innerHTML=upcoming.length?upcoming.slice(0,5).map(s=>`
     <div class="flex items-center gap-3">
-      <div class="w-3 h-8 rounded-full flex-shrink-0" style="background:${s.color}"></div>
+      <div class="w-3 h-8 rounded-full" style="background:${s.color}"></div>
       <div class="flex-1"><p class="text-sm font-semibold text-gray-800">${s.name}</p><p class="text-xs text-gray-400">${new Date(s.nextDate).toLocaleDateString()}</p></div>
       <span class="text-sm font-bold text-gray-900">${fmt(s.amount)}</span>
-    </div>`).join('') : '<p class="text-gray-400 text-sm">No upcoming bills in 14 days 🎉</p>';
+    </div>`).join(''):'<p class="text-gray-400 text-sm text-center py-4">No upcoming bills in 14 days 🎉</p>';
 }
 
-let trendChart, pieChart;
-function initCharts() {
-  const months = ['Nov','Dec','Jan','Feb','Mar','Apr'];
-  const incomeData = [4200, 5100, 4800, 6200, 5500, 6350];
-  const expenseData = [3100, 2900, 3200, 2600, 3000, 2847];
-
-  if (trendChart) trendChart.destroy();
-  trendChart = new Chart(document.getElementById('trend-chart'), {
-    type: 'line',
-    data: {
-      labels: months,
-      datasets: [
-        {label:'Income',data:incomeData,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4,pointRadius:3},
-        {label:'Expenses',data:expenseData,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.1)',fill:true,tension:.4,pointRadius:3}
-      ]
-    },
-    options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}},scales:{y:{beginAtZero:false,ticks:{callback:v=>'$'+v.toLocaleString(),font:{size:10}},grid:{color:'#f3f4f6'}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
+function initCharts(){
+  if(tChart)tChart.destroy();
+  if(pChart)pChart.destroy();
+  tChart=new Chart(document.getElementById('trend-chart'),{
+    type:'line',
+    data:{labels:['Nov','Dec','Jan','Feb','Mar','Apr'],datasets:[
+      {label:'Income',data:[4200,5100,4800,6200,5500,6350],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#10b981'},
+      {label:'Expenses',data:[3100,2900,3200,2600,3000,2847],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#ef4444'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:6}}},scales:{y:{beginAtZero:false,ticks:{callback:v=>'$'+v.toLocaleString(),font:{size:9}},grid:{color:'#f3f4f6'}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
   });
-
-  const cats = ['Groceries','Food & Dining','Transport','Entertainment','Shopping','Utilities','Other'];
-  const catAmounts = [124.5, 25.25, 24, 25.98, 67.23, 89, 32.15];
-  const catColors = cats.map(c => CAT_COLORS[c] || '#94a3b8');
-
-  if (pieChart) pieChart.destroy();
-  pieChart = new Chart(document.getElementById('pie-chart'), {
-    type: 'doughnut',
-    data: { labels: cats, datasets: [{data:catAmounts,backgroundColor:catColors,borderWidth:2,borderColor:'#fff'}] },
-    options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}}},cutout:'60%'}
+  const cats=['Groceries','Food & Dining','Transport','Entertainment','Shopping','Utilities','Other'];
+  const vals=[124.5,25.25,24,25.98,67.23,89,32.15];
+  pChart=new Chart(document.getElementById('pie-chart'),{
+    type:'doughnut',
+    data:{labels:cats,datasets:[{data:vals,backgroundColor:cats.map(c=>CAT_COLORS[c]||'#94a3b8'),borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:9,padding:5}}},cutout:'58%'}
   });
 }
 
-function setGreeting() {
-  const h = new Date().getHours();
-  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('dash-greeting').textContent = g + ', Alex 👋';
-}
+// ===================== INIT =====================
+function initApp(){
+  const h=new Date().getHours();
+  const g=h<12?'Good morning':'Good afternoon';
+  document.getElementById('dash-greeting').textContent=g+', '+currentUser.name.split(' ')[0]+' 👋';
+  document.getElementById('dash-avatar').textContent=initials(currentUser.name);
 
-function initApp() {
-  setGreeting();
-  updateDashboardSummary();
-  setTimeout(initCharts, 100);
+  // Profile page
+  document.getElementById('profile-avatar').textContent=initials(currentUser.name);
+  document.getElementById('profile-name').textContent=currentUser.name;
+  document.getElementById('profile-email').textContent=currentUser.email;
+  const pb=document.getElementById('profile-badge');
+  pb.className='badge mt-1 '+(currentUser.role==='ADMIN'?'badge-admin':'badge-user');
+  pb.textContent=currentUser.role;
+
+  // Sidebar user
+  document.getElementById('sidebar-user').innerHTML=`<div class="w-7 h-7 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 text-xs font-bold">${initials(currentUser.name)}</div><div class="min-w-0"><p class="text-xs font-semibold text-gray-800 truncate">${currentUser.name}</p><p class="text-xs text-gray-400">${currentUser.role}</p></div>`;
+
+  // Show admin nav if admin
+  if(currentUser.role==='ADMIN'){
+    document.getElementById('admin-nav').classList.remove('hidden');
+    document.getElementById('admin-nav').style.display='flex';
+  }
+
+  updateDashboard();
+  setTimeout(initCharts,80);
   showPage('dashboard');
+
+  // Wire up add buttons to proper open functions
+  document.querySelector('[onclick="openModal(\'modal-add-tx\')"]')?.setAttribute('onclick','openAddTx()');
+  document.querySelector('[onclick="openModal(\'modal-add-budget\')"]')?.setAttribute('onclick','openAddBudget()');
+  document.querySelector('[onclick="openModal(\'modal-add-sub\')"]')?.setAttribute('onclick','openAddSub()');
 }
 
-// Auto-login check
-window.onload = () => {
-  if (localStorage.getItem('ft_auth') === '1') {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
+window.onload=()=>{
+  const saved=ld('auth',null);
+  if(saved&&saved.email){
+    currentUser=saved;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
     initApp();
+  } else {
+    document.getElementById('login-email').value='demo@fintrack.app';
+    document.getElementById('login-password').value='Demo123!';
   }
 };
-
-// Enter key on login
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
-});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();});
 </script>
 </body>
 </html>
