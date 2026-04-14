@@ -410,9 +410,24 @@
         <button id="tx-tab-income" onclick="setTxType('INCOME')" class="flex-1 py-2 text-xs font-bold transition-colors bg-white text-gray-400">Income</button>
       </div>
       <input type="hidden" id="f-tx-type" value="EXPENSE">
+      <!-- Active currency indicator -->
+      <div id="tx-currency-bar" class="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-2">
+        <div class="flex items-center gap-2">
+          <span class="text-indigo-500 text-sm">💱</span>
+          <span class="text-xs font-semibold text-indigo-700">Active currency:</span>
+          <span id="tx-modal-currency-code" class="text-xs font-black text-indigo-900 bg-indigo-200 px-2 py-0.5 rounded-full">USD</span>
+        </div>
+        <span id="tx-modal-currency-rate" class="text-xs text-indigo-500">1 USD = 1.00 USD</span>
+      </div>
       <div><label class="block text-xs font-semibold text-gray-600 mb-1" id="f-tx-desc-label">Description</label><input id="f-tx-desc" type="text" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="e.g. Grocery shopping"></div>
       <div class="grid grid-cols-2 gap-3">
-        <div><label class="block text-xs font-semibold text-gray-600 mb-1">Amount (<span class="tx-currency-symbol">$</span>) <span class="text-red-400">*</span></label><input id="f-tx-amount" type="number" step="0.01" min="0.01" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="0.00"></div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Amount <span class="text-red-400">*</span></label>
+          <div class="relative">
+            <span id="tx-amount-prefix" class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500 pointer-events-none tx-currency-symbol">$</span>
+            <input id="f-tx-amount" type="number" step="any" min="0.000001" class="w-full border-2 border-gray-200 rounded-xl pl-8 pr-3 py-2.5 text-sm" placeholder="0.00">
+          </div>
+        </div>
         <div><label class="block text-xs font-semibold text-gray-600 mb-1">Date <span class="text-red-400">*</span></label><input id="f-tx-date" type="date" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm"></div>
       </div>
       <div><label class="block text-xs font-semibold text-gray-600 mb-1" id="f-tx-cat-label">Category</label>
@@ -434,11 +449,16 @@
     </div>
     <input type="hidden" id="budget-edit-id">
     <div class="space-y-3">
+      <div class="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-2">
+        <div class="flex items-center gap-2"><span class="text-indigo-500 text-sm">💱</span><span class="text-xs font-semibold text-indigo-700">Active currency:</span><span class="budget-currency-badge text-xs font-black text-indigo-900 bg-indigo-200 px-2 py-0.5 rounded-full">USD</span></div>
+        <span class="budget-currency-rate text-xs text-indigo-500">1 USD = 1.00 USD</span>
+      </div>
       <div><label class="block text-xs font-semibold text-gray-600 mb-1">Category</label>
         <select id="f-budget-cat" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
           <option>Groceries</option><option>Food & Dining</option><option>Transportation</option><option>Entertainment</option><option>Shopping</option><option>Utilities</option><option>Healthcare</option><option>Fitness</option><option>Other</option>
         </select></div>
-      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Budget Amount (<span class="tx-currency-symbol">$</span>)</label><input id="f-budget-amount" type="number" min="1" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="0"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Budget Amount (<span class="tx-currency-symbol">$</span>)</label>
+        <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500 pointer-events-none tx-currency-symbol">$</span><input id="f-budget-amount" type="number" min="0.000001" step="any" class="w-full border-2 border-gray-200 rounded-xl pl-8 pr-3 py-2.5 text-sm" placeholder="0"></div></div>
       <div><label class="block text-xs font-semibold text-gray-600 mb-1">Alert at (%)</label>
         <select id="f-budget-alert" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
           <option value="70">70%</option><option value="80" selected>80%</option><option value="90">90%</option><option value="100">100%</option>
@@ -457,8 +477,13 @@
     </div>
     <input type="hidden" id="sub-edit-id">
     <div class="space-y-3">
+      <div class="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-2">
+        <div class="flex items-center gap-2"><span class="text-indigo-500 text-sm">💱</span><span class="text-xs font-semibold text-indigo-700">Active currency:</span><span class="sub-currency-badge text-xs font-black text-indigo-900 bg-indigo-200 px-2 py-0.5 rounded-full">USD</span></div>
+        <span class="sub-currency-rate text-xs text-indigo-500">1 USD = 1.00 USD</span>
+      </div>
       <div><label class="block text-xs font-semibold text-gray-600 mb-1">Name</label><input id="f-sub-name" type="text" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="e.g. Netflix"></div>
-      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Amount (<span class="tx-currency-symbol">$</span>)</label><input id="f-sub-amount" type="number" step="0.01" min="0" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="0.00"></div>
+      <div><label class="block text-xs font-semibold text-gray-600 mb-1">Amount (<span class="tx-currency-symbol">$</span>)</label>
+        <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500 pointer-events-none tx-currency-symbol">$</span><input id="f-sub-amount" type="number" step="any" min="0.000001" class="w-full border-2 border-gray-200 rounded-xl pl-8 pr-3 py-2.5 text-sm" placeholder="0.00"></div></div>
       <div class="grid grid-cols-2 gap-3">
         <div><label class="block text-xs font-semibold text-gray-600 mb-1">Billing Cycle</label>
           <select id="f-sub-cycle" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold">
@@ -639,8 +664,8 @@ function changeCurrency(code){
   if(sel)sel.value=code;
   const badge=document.getElementById('profile-currency-badge');
   if(badge)badge.textContent=code+' '+c.s;
-  // Update modal amount labels
-  document.querySelectorAll('.tx-currency-symbol').forEach(el=>el.textContent=c.s);
+  // Update all modal currency bars and symbol spans
+  updateModalCurrencyBars();
 }
 function saveCurrency(val){changeCurrency(val);}
 
@@ -740,6 +765,24 @@ function outsideClose(e,id){if(e.target.id===id)closeModal(id);}
 const EXPENSE_CATS=['Food & Dining','Groceries','Transportation','Entertainment','Shopping','Healthcare','Utilities','Fitness','Education','Travel','Personal Care','Other'];
 const INCOME_CATS=['Salary / Paycheck','Freelance','Business Income','Investment Returns','Rental Income','Bonus / Commission','Side Hustle','Gift / Inheritance','Tax Refund','Government Benefits','Interest / Dividends','Other Income'];
 
+function updateModalCurrencyBars(){
+  const c=getCurrencyInfo();
+  const code=activeCurrency;
+  const rateLabel=code==='USD'?'Base currency (no conversion)':`1 USD = ${c.r.toLocaleString('en-US',{maximumFractionDigits:4})} ${code}`;
+  // Transaction modal
+  const mc=document.getElementById('tx-modal-currency-code');
+  const mr=document.getElementById('tx-modal-currency-rate');
+  if(mc)mc.textContent=code+' '+c.s;
+  if(mr)mr.textContent=rateLabel;
+  // Budget modal
+  document.querySelectorAll('.budget-currency-badge').forEach(el=>el.textContent=code+' '+c.s);
+  document.querySelectorAll('.budget-currency-rate').forEach(el=>el.textContent=rateLabel);
+  // Sub modal
+  document.querySelectorAll('.sub-currency-badge').forEach(el=>el.textContent=code+' '+c.s);
+  document.querySelectorAll('.sub-currency-rate').forEach(el=>el.textContent=rateLabel);
+  // All symbol spans (label + prefix)
+  document.querySelectorAll('.tx-currency-symbol').forEach(el=>el.textContent=c.s);
+}
 function setTxType(type){
   document.getElementById('f-tx-type').value=type;
   const isIncome=type==='INCOME';
@@ -760,6 +803,8 @@ function setTxType(type){
   const prev=sel.value;
   sel.innerHTML=cats.map(c=>`<option value="${c}">${c}</option>`).join('');
   if(cats.includes(prev))sel.value=prev;
+  // Sync currency bar
+  updateModalCurrencyBars();
 }
 
 function openAddTx(){
@@ -787,10 +832,12 @@ function openAddIncome(){
 function openEditTx(id){
   const t=transactions.find(x=>x.id===id);if(!t)return;
   const isIncome=t.type==='INCOME';
+  const c=getCurrencyInfo();
   document.getElementById('tx-modal-title').textContent=isIncome?'Edit Income':'Edit Expense';
   document.getElementById('tx-edit-id').value=id;
   document.getElementById('f-tx-desc').value=t.description;
-  document.getElementById('f-tx-amount').value=t.amount;
+  // Convert stored USD → active currency for the input field
+  document.getElementById('f-tx-amount').value=(t.amount*c.r).toFixed(c.d);
   document.getElementById('f-tx-date').value=t.date;
   document.getElementById('f-tx-notes').value=t.notes||'';
   document.getElementById('tx-err').classList.add('hidden');
@@ -805,7 +852,7 @@ function showTxErr(msg){const el=document.getElementById('tx-err');el.textConten
 function saveTx(){
   const desc=document.getElementById('f-tx-desc').value.trim();
   const amountRaw=document.getElementById('f-tx-amount').value;
-  const amount=parseFloat(amountRaw);
+  const amountInCurrency=parseFloat(amountRaw);
   const type=document.getElementById('f-tx-type').value;
   const cat=document.getElementById('f-tx-cat').value;
   const date=document.getElementById('f-tx-date').value;
@@ -813,13 +860,15 @@ function saveTx(){
   const editId=document.getElementById('tx-edit-id').value;
   document.getElementById('tx-err').classList.add('hidden');
   if(!desc){showTxErr('Description is required.');return;}
-  if(!amountRaw||isNaN(amount)||amount<=0){showTxErr('Enter a valid amount greater than 0.');return;}
+  if(!amountRaw||isNaN(amountInCurrency)||amountInCurrency<=0){showTxErr('Enter a valid amount greater than 0.');return;}
   if(!date){showTxErr('Date is required.');return;}
+  // Convert from active currency → USD for storage
+  const amountUSD=amountInCurrency/getCurrencyInfo().r;
   if(editId){
     const i=transactions.findIndex(x=>x.id==editId);
-    if(i>=0)transactions[i]={...transactions[i],description:desc,amount,type,category:cat,date,notes};
+    if(i>=0)transactions[i]={...transactions[i],description:desc,amount:amountUSD,type,category:cat,date,notes};
   } else {
-    transactions.unshift({id:Date.now(),description:desc,amount,type,category:cat,date,notes});
+    transactions.unshift({id:Date.now(),description:desc,amount:amountUSD,type,category:cat,date,notes});
   }
   sv('tx',transactions);closeModal('modal-add-tx');renderTx();updateDashboard();
 }
@@ -862,30 +911,35 @@ function openAddBudget(){
   document.getElementById('f-budget-cat').value='Groceries';
   document.getElementById('f-budget-amount').value='';
   document.getElementById('f-budget-alert').value='80';
+  updateModalCurrencyBars();
   openModal('modal-add-budget');
 }
 function openEditBudget(id){
   const b=budgets.find(x=>x.id===id);if(!b)return;
+  const c=getCurrencyInfo();
   document.getElementById('budget-modal-title').textContent='Edit Budget';
   document.getElementById('budget-edit-id').value=id;
   document.getElementById('f-budget-cat').value=b.category;
-  document.getElementById('f-budget-amount').value=b.amount;
+  // Convert stored USD → active currency for the input
+  document.getElementById('f-budget-amount').value=(b.amount*c.r).toFixed(c.d);
   document.getElementById('f-budget-alert').value=b.alert||80;
   openModal('modal-add-budget');
 }
 function saveBudget(){
   const cat=document.getElementById('f-budget-cat').value;
-  const amount=parseFloat(document.getElementById('f-budget-amount').value);
-  const alert=parseInt(document.getElementById('f-budget-alert').value);
+  const amountInCurrency=parseFloat(document.getElementById('f-budget-amount').value);
+  const alertVal=parseInt(document.getElementById('f-budget-alert').value);
   const editId=document.getElementById('budget-edit-id').value;
-  if(!amount){alert('Enter a budget amount.');return;}
+  if(!amountInCurrency||amountInCurrency<=0){alert('Enter a valid budget amount.');return;}
+  // Convert from active currency → USD for storage
+  const amount=amountInCurrency/getCurrencyInfo().r;
   if(editId){
     const i=budgets.findIndex(x=>x.id==editId);
-    if(i>=0)budgets[i]={...budgets[i],category:cat,amount,alert};
+    if(i>=0)budgets[i]={...budgets[i],category:cat,amount,alert:alertVal};
   } else {
     const ex=budgets.findIndex(b=>b.category===cat);
-    if(ex>=0)budgets[ex]={...budgets[ex],amount,alert};
-    else budgets.push({id:Date.now(),category:cat,amount,alert});
+    if(ex>=0)budgets[ex]={...budgets[ex],amount,alert:alertVal};
+    else budgets.push({id:Date.now(),category:cat,amount,alert:alertVal});
   }
   sv('budgets',budgets);closeModal('modal-add-budget');renderBudgets();
 }
@@ -927,14 +981,17 @@ function openAddSub(){
   document.getElementById('f-sub-status').value='Active';
   document.getElementById('f-sub-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('f-sub-cat').value='Entertainment';
+  updateModalCurrencyBars();
   openModal('modal-add-sub');
 }
 function openEditSub(id){
   const s=subscriptions.find(x=>x.id===id);if(!s)return;
+  const c=getCurrencyInfo();
   document.getElementById('sub-modal-title').textContent='Edit Subscription';
   document.getElementById('sub-edit-id').value=id;
   document.getElementById('f-sub-name').value=s.name;
-  document.getElementById('f-sub-amount').value=s.amount;
+  // Convert stored USD → active currency for the input
+  document.getElementById('f-sub-amount').value=(s.amount*c.r).toFixed(c.d);
   document.getElementById('f-sub-cycle').value=s.cycle;
   document.getElementById('f-sub-status').value=s.status||'Active';
   document.getElementById('f-sub-date').value=s.nextDate;
@@ -943,13 +1000,15 @@ function openEditSub(id){
 }
 function saveSub(){
   const name=document.getElementById('f-sub-name').value.trim();
-  const amount=parseFloat(document.getElementById('f-sub-amount').value);
+  const amountInCurrency=parseFloat(document.getElementById('f-sub-amount').value);
   const cycle=document.getElementById('f-sub-cycle').value;
   const status=document.getElementById('f-sub-status').value;
   const nextDate=document.getElementById('f-sub-date').value;
   const category=document.getElementById('f-sub-cat').value;
   const editId=document.getElementById('sub-edit-id').value;
-  if(!name||!amount||!nextDate){alert('Please fill all required fields.');return;}
+  if(!name||!amountInCurrency||!nextDate){alert('Please fill all required fields.');return;}
+  // Convert from active currency → USD for storage
+  const amount=amountInCurrency/getCurrencyInfo().r;
   if(editId){
     const i=subscriptions.findIndex(x=>x.id==editId);
     if(i>=0)subscriptions[i]={...subscriptions[i],name,amount,cycle,status,nextDate,category};
@@ -1148,6 +1207,7 @@ function initApp(){
   }
 
   changeCurrency(activeCurrency);  // apply saved currency and sync all UI
+  updateModalCurrencyBars();       // prime all modal currency bars
   setTimeout(initCharts,80);
   showPage('dashboard');
 
