@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTrack - Personal Finance</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#f9fafb; }
+  .nav-item { transition: all .2s; }
+  .nav-item.active { background:#ede9fe; color:#4f46e5; }
+  .nav-item:hover { background:#f3f4f6; }
+  .nav-item.active:hover { background:#ede9fe; }
+  .page { display:none; }
+  .page.active { display:block; }
+  .progress-bar { transition: width .6s ease; }
+  .card { background:#fff; border-radius:16px; box-shadow:0 1px 8px rgba(0,0,0,.06); }
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:50; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  input, select { outline:none; }
+  input:focus, select:focus { border-color:#4f46e5 !important; }
+  @media(max-width:768px){ #sidebar{display:none;} #bottom-nav{display:flex;} #main{margin-left:0 !important; padding-bottom:80px;} }
+  @media(min-width:769px){ #sidebar{display:flex;} #bottom-nav{display:none;} #main{margin-left:240px;} }
+  #bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f3f4f6; z-index:40; height:64px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-50 to-purple-50">
+    <div class="card w-full max-w-md p-8">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <span class="text-white text-3xl font-bold">F</span>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Welcome back</h1>
+        <p class="text-gray-500 mt-1">Sign in to your FinTrack account</p>
+      </div>
+      <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 mb-4 text-sm"></div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+          <input id="login-email" type="email" value="demo@fintrack.app" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900" placeholder="you@example.com">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+          <input id="login-password" type="password" value="Demo123!" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900" placeholder="••••••••">
+        </div>
+        <button onclick="doLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">
+          Sign In
+        </button>
+        <p class="text-center text-sm text-gray-500">Demo: <b>demo@fintrack.app</b> / <b>Demo123!</b></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="fixed top-0 left-0 h-full w-60 bg-white border-r border-gray-100 flex-col z-40 shadow-sm">
+    <div class="p-6 border-b border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <span class="text-white font-bold text-sm">F</span>
+        </div>
+        <span class="font-bold text-gray-900 text-lg">FinTrack</span>
+      </div>
+    </div>
+    <nav class="flex-1 p-4 space-y-1">
+      <button onclick="showPage('dashboard')" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="dashboard">
+        <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
+      </button>
+      <button onclick="showPage('transactions')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="transactions">
+        <i class="fa-solid fa-arrow-right-arrow-left w-5 text-center"></i> Transactions
+      </button>
+      <button onclick="showPage('budgets')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="budgets">
+        <i class="fa-solid fa-chart-pie w-5 text-center"></i> Budgets
+      </button>
+      <button onclick="showPage('subscriptions')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="subscriptions">
+        <i class="fa-solid fa-rotate w-5 text-center"></i> Subscriptions
+      </button>
+      <button onclick="showPage('profile')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-700" data-page="profile">
+        <i class="fa-solid fa-user w-5 text-center"></i> Profile
+      </button>
+    </nav>
+    <div class="p-4 border-t border-gray-100">
+      <button onclick="doLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
+        <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom Nav (mobile) -->
+  <div id="bottom-nav" class="hidden">
+    <button onclick="showPage('dashboard')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="dashboard">
+      <i class="fa-solid fa-house text-lg"></i> Home
+    </button>
+    <button onclick="showPage('transactions')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="transactions">
+      <i class="fa-solid fa-arrow-right-arrow-left text-lg"></i> Tx
+    </button>
+    <button onclick="showPage('budgets')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="budgets">
+      <i class="fa-solid fa-chart-pie text-lg"></i> Budget
+    </button>
+    <button onclick="showPage('subscriptions')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="subscriptions">
+      <i class="fa-solid fa-rotate text-lg"></i> Subs
+    </button>
+    <button onclick="showPage('profile')" class="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold text-gray-400 bn-btn" data-page="profile">
+      <i class="fa-solid fa-user text-lg"></i> Profile
+    </button>
+  </div>
+
+  <!-- Main -->
+  <div id="main" class="min-h-screen">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active p-6 max-w-5xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900" id="dash-greeting">Good morning, Alex 👋</h1>
+          <p class="text-gray-500 text-sm mt-1">Here's your financial snapshot</p>
+        </div>
+        <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">AJ</div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="card p-4 col-span-2 md:col-span-1 bg-gradient-to-br from-indigo-600 to-purple-600">
+          <p class="text-indigo-200 text-xs font-semibold">NET SAVINGS</p>
+          <p class="text-white text-2xl font-bold mt-1" id="net-savings">$3,503</p>
+          <p class="text-indigo-200 text-xs mt-2">This month</p>
+        </div>
+        <div class="card p-4">
+          <p class="text-gray-500 text-xs font-semibold">INCOME</p>
+          <p class="text-green-600 text-xl font-bold mt-1" id="total-income">$6,350</p>
+          <p class="text-gray-400 text-xs mt-2">↑ This month</p>
+        </div>
+        <div class="card p-4">
+          <p class="text-gray-500 text-xs font-semibold">EXPENSES</p>
+          <p class="text-red-500 text-xl font-bold mt-1" id="total-expenses">$2,847</p>
+          <p class="text-gray-400 text-xs mt-2">↓ This month</p>
+        </div>
+        <div class="card p-4">
+          <p class="text-gray-500 text-xs font-semibold">SAVINGS RATE</p>
+          <p class="text-indigo-600 text-xl font-bold mt-1" id="savings-rate">55%</p>
+          <p class="text-gray-400 text-xs mt-2">Of income saved</p>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="card p-5">
+          <h3 class="font-bold text-gray-900 mb-4">📈 Income vs Expenses</h3>
+          <canvas id="trend-chart" height="180"></canvas>
+        </div>
+        <div class="card p-5">
+          <h3 class="font-bold text-gray-900 mb-4">🥧 Spending by Category</h3>
+          <canvas id="pie-chart" height="180"></canvas>
+        </div>
+      </div>
+
+      <!-- AI Insights -->
+      <div class="card p-5 mb-6 border-l-4 border-indigo-400 bg-indigo-50">
+        <p class="font-bold text-indigo-900">✨ AI Insight</p>
+        <p class="text-indigo-700 text-sm mt-1">You're spending $154/month on subscriptions. Cancelling unused ones could save you up to $600/year.</p>
+      </div>
+
+      <!-- Recent Transactions & Upcoming Subs -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-900">🕒 Recent Transactions</h3>
+            <button onclick="showPage('transactions')" class="text-indigo-600 text-sm font-semibold">See all</button>
+          </div>
+          <div id="recent-tx" class="space-y-3"></div>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-900">⏰ Upcoming Bills</h3>
+            <button onclick="showPage('subscriptions')" class="text-indigo-600 text-sm font-semibold">See all</button>
+          </div>
+          <div id="upcoming-subs" class="space-y-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div id="page-transactions" class="page p-6 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Transactions</h1>
+        <button onclick="openModal('add-tx-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-colors">
+          <i class="fa-solid fa-plus mr-1"></i> Add
+        </button>
+      </div>
+      <div class="card p-4 mb-4">
+        <div class="flex gap-3 flex-wrap">
+          <input id="tx-search" type="text" placeholder="🔍 Search transactions..." oninput="renderTransactions()" class="flex-1 min-w-48 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm">
+          <select id="tx-filter" onchange="renderTransactions()" class="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold">
+            <option value="">All</option>
+            <option value="INCOME">Income</option>
+            <option value="EXPENSE">Expense</option>
+          </select>
+        </div>
+      </div>
+      <div id="tx-list" class="space-y-3"></div>
+    </div>
+
+    <!-- BUDGETS -->
+    <div id="page-budgets" class="page p-6 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Budgets</h1>
+        <button onclick="openModal('add-budget-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-colors">
+          <i class="fa-solid fa-plus mr-1"></i> Add Budget
+        </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card p-4 text-center">
+          <p class="text-gray-500 text-xs font-semibold">TOTAL BUDGETED</p>
+          <p class="text-2xl font-bold text-gray-900 mt-1" id="total-budgeted">$1,460</p>
+        </div>
+        <div class="card p-4 text-center">
+          <p class="text-gray-500 text-xs font-semibold">TOTAL SPENT</p>
+          <p class="text-2xl font-bold text-red-500 mt-1" id="total-budget-spent">$0</p>
+        </div>
+        <div class="card p-4 text-center">
+          <p class="text-gray-500 text-xs font-semibold">REMAINING</p>
+          <p class="text-2xl font-bold text-green-600 mt-1" id="total-remaining">$1,460</p>
+        </div>
+      </div>
+      <div id="budget-list" class="space-y-4"></div>
+    </div>
+
+    <!-- SUBSCRIPTIONS -->
+    <div id="page-subscriptions" class="page p-6 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Subscriptions</h1>
+        <button onclick="openModal('add-sub-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-colors">
+          <i class="fa-solid fa-plus mr-1"></i> Add
+        </button>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="card p-4 text-center">
+          <p class="text-gray-500 text-xs font-semibold">MONTHLY TOTAL</p>
+          <p class="text-2xl font-bold text-gray-900 mt-1" id="sub-monthly">$0</p>
+        </div>
+        <div class="card p-4 text-center">
+          <p class="text-gray-500 text-xs font-semibold">YEARLY TOTAL</p>
+          <p class="text-2xl font-bold text-gray-900 mt-1" id="sub-yearly">$0</p>
+        </div>
+      </div>
+      <div id="sub-list" class="space-y-3"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="page-profile" class="page p-6 max-w-2xl mx-auto">
+      <h1 class="text-2xl font-bold text-gray-900 mb-6">Profile</h1>
+      <div class="card p-6 mb-4 flex items-center gap-4">
+        <div class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xl font-bold">AJ</div>
+        <div>
+          <p class="font-bold text-gray-900 text-lg">Alex Johnson</p>
+          <p class="text-gray-500 text-sm">demo@fintrack.app</p>
+          <span class="bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-0.5 rounded-full mt-1 inline-block">Demo Account</span>
+        </div>
+      </div>
+      <div class="card p-5 mb-4 space-y-4">
+        <h3 class="font-bold text-gray-900">Account Settings</h3>
+        <div class="flex items-center justify-between">
+          <div><p class="font-semibold text-gray-700 text-sm">Push Notifications</p><p class="text-gray-400 text-xs">Get alerts for bills and budgets</p></div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+          </label>
+        </div>
+        <div class="flex items-center justify-between">
+          <div><p class="font-semibold text-gray-700 text-sm">Email Reports</p><p class="text-gray-400 text-xs">Weekly spending summary</p></div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+          </label>
+        </div>
+        <div class="flex items-center justify-between">
+          <div><p class="font-semibold text-gray-700 text-sm">Currency</p></div>
+          <select class="border-2 border-gray-200 rounded-xl px-3 py-1.5 text-sm font-semibold">
+            <option>USD</option><option>EUR</option><option>GBP</option><option>PHP</option>
+          </select>
+        </div>
+      </div>
+      <div class="card p-5 mb-4 space-y-2">
+        <h3 class="font-bold text-gray-900 mb-3">App Info</h3>
+        <div class="flex justify-between text-sm"><span class="text-gray-500">Version</span><span class="font-semibold text-gray-700">1.0.0</span></div>
+        <div class="flex justify-between text-sm"><span class="text-gray-500">Plan</span><span class="font-semibold text-indigo-600">Free Demo</span></div>
+        <div class="flex justify-between text-sm"><span class="text-gray-500">Data</span><span class="font-semibold text-gray-700">Stored locally</span></div>
+      </div>
+      <button onclick="doLogout()" class="w-full card p-4 text-red-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-50 transition-colors">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD TRANSACTION MODAL -->
+<div id="add-tx-modal" class="modal-overlay" onclick="closeModalOutside(event,'add-tx-modal')">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-bold text-gray-900 text-lg">Add Transaction</h3>
+      <button onclick="closeModal('add-tx-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div class="space-y-4">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+        <input id="tx-desc" type="text" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="e.g. Grocery shopping"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Amount ($)</label>
+        <input id="tx-amount" type="number" step="0.01" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="0.00"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Type</label>
+        <select id="tx-type" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold">
+          <option value="EXPENSE">Expense</option><option value="INCOME">Income</option>
+        </select></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+        <select id="tx-cat" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold">
+          <option>Food & Dining</option><option>Groceries</option><option>Transportation</option>
+          <option>Entertainment</option><option>Shopping</option><option>Healthcare</option>
+          <option>Utilities</option><option>Income</option><option>Other</option>
+        </select></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Date</label>
+        <input id="tx-date" type="date" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm"></div>
+      <button onclick="addTransaction()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">Add Transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD BUDGET MODAL -->
+<div id="add-budget-modal" class="modal-overlay" onclick="closeModalOutside(event,'add-budget-modal')">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-bold text-gray-900 text-lg">Add Budget</h3>
+      <button onclick="closeModal('add-budget-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div class="space-y-4">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+        <select id="budget-cat" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold">
+          <option>Groceries</option><option>Food & Dining</option><option>Transportation</option>
+          <option>Entertainment</option><option>Shopping</option><option>Utilities</option>
+          <option>Healthcare</option><option>Fitness</option><option>Other</option>
+        </select></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Budget Amount ($)</label>
+        <input id="budget-amount" type="number" step="1" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="0"></div>
+      <button onclick="addBudget()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">Save Budget</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SUBSCRIPTION MODAL -->
+<div id="add-sub-modal" class="modal-overlay" onclick="closeModalOutside(event,'add-sub-modal')">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-bold text-gray-900 text-lg">Add Subscription</h3>
+      <button onclick="closeModal('add-sub-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div class="space-y-4">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Name</label>
+        <input id="sub-name" type="text" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="e.g. Netflix"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Amount ($)</label>
+        <input id="sub-amount" type="number" step="0.01" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="0.00"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Billing Cycle</label>
+        <select id="sub-cycle" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold">
+          <option value="Monthly">Monthly</option><option value="Yearly">Yearly</option>
+        </select></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Next Billing Date</label>
+        <input id="sub-date" type="date" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm"></div>
+      <button onclick="addSubscription()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">Add Subscription</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CAT_ICONS = {'Food & Dining':'🍽️','Groceries':'🛒','Transportation':'🚗','Entertainment':'🎬','Shopping':'🛍️','Healthcare':'💊','Utilities':'💡','Income':'💰','Fitness':'🏋️','Subscriptions':'📱','Other':'💳'};
+const CAT_COLORS = {'Food & Dining':'#f59e0b','Groceries':'#10b981','Transportation':'#3b82f6','Entertainment':'#8b5cf6','Shopping':'#ec4899','Healthcare':'#ef4444','Utilities':'#6b7280','Income':'#10b981','Fitness':'#7c3aed','Other':'#94a3b8'};
+const SUB_COLORS = ['#ef4444','#1db954','#ff0000','#007aff','#ff9900','#7c3aed','#0ea5e9','#f59e0b'];
+
+const DEFAULT_TX = [
+  {id:1,description:'Salary Deposit',amount:5500,type:'INCOME',category:'Income',date:'2026-04-01'},
+  {id:2,description:'Whole Foods Market',amount:124.50,type:'EXPENSE',category:'Groceries',date:'2026-04-02'},
+  {id:3,description:'Netflix Subscription',amount:15.99,type:'EXPENSE',category:'Entertainment',date:'2026-04-03'},
+  {id:4,description:'Chipotle',amount:18.50,type:'EXPENSE',category:'Food & Dining',date:'2026-04-03'},
+  {id:5,description:'Uber Ride',amount:24.00,type:'EXPENSE',category:'Transportation',date:'2026-04-04'},
+  {id:6,description:'Spotify Premium',amount:9.99,type:'EXPENSE',category:'Entertainment',date:'2026-04-05'},
+  {id:7,description:'Amazon Purchase',amount:67.23,type:'EXPENSE',category:'Shopping',date:'2026-04-06'},
+  {id:8,description:'Electric Bill',amount:89.00,type:'EXPENSE',category:'Utilities',date:'2026-04-07'},
+  {id:9,description:'Gym Membership',amount:45.00,type:'EXPENSE',category:'Fitness',date:'2026-04-07'},
+  {id:10,description:'Freelance Payment',amount:850,type:'INCOME',category:'Income',date:'2026-04-08'},
+  {id:11,description:'CVS Pharmacy',amount:32.15,type:'EXPENSE',category:'Healthcare',date:'2026-04-08'},
+  {id:12,description:'Starbucks',amount:6.75,type:'EXPENSE',category:'Food & Dining',date:'2026-04-09'},
+];
+const DEFAULT_BUDGETS = [
+  {id:1,category:'Groceries',amount:400},
+  {id:2,category:'Food & Dining',amount:300},
+  {id:3,category:'Transportation',amount:200},
+  {id:4,category:'Entertainment',amount:100},
+  {id:5,category:'Shopping',amount:250},
+  {id:6,category:'Utilities',amount:150},
+  {id:7,category:'Fitness',amount:60},
+];
+const DEFAULT_SUBS = [
+  {id:1,name:'Netflix',amount:15.99,cycle:'Monthly',nextDate:'2026-05-03',color:'#ef4444'},
+  {id:2,name:'Spotify',amount:9.99,cycle:'Monthly',nextDate:'2026-05-05',color:'#1db954'},
+  {id:3,name:'Adobe Creative Cloud',amount:54.99,cycle:'Monthly',nextDate:'2026-04-15',color:'#ff0000'},
+  {id:4,name:'iCloud Storage',amount:2.99,cycle:'Monthly',nextDate:'2026-04-20',color:'#007aff'},
+  {id:5,name:'Amazon Prime',amount:139,cycle:'Yearly',nextDate:'2027-01-01',color:'#ff9900'},
+  {id:6,name:'Planet Fitness',amount:25.00,cycle:'Monthly',nextDate:'2026-04-17',color:'#7c3aed'},
+];
+
+function getData(key, def) {
+  try { const v = localStorage.getItem('ft_'+key); return v ? JSON.parse(v) : def; } catch { return def; }
+}
+function saveData(key, val) { localStorage.setItem('ft_'+key, JSON.stringify(val)); }
+
+let transactions = getData('tx', DEFAULT_TX);
+let budgets = getData('budgets', DEFAULT_BUDGETS);
+let subscriptions = getData('subs', DEFAULT_SUBS);
+
+const fmt = n => '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  if (email === 'demo@fintrack.app' && pass === 'Demo123!') {
+    localStorage.setItem('ft_auth','1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    err.textContent = 'Invalid email or password. Use demo@fintrack.app / Demo123!';
+    err.classList.remove('hidden');
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('ft_auth');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'block';
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === name);
+    b.style.color = b.dataset.page === name ? '#4f46e5' : '';
+  });
+  document.querySelectorAll('.bn-btn').forEach(b => {
+    const isActive = b.dataset.page === name;
+    b.style.color = isActive ? '#4f46e5' : '#9ca3af';
+  });
+  if (name === 'transactions') renderTransactions();
+  if (name === 'budgets') renderBudgets();
+  if (name === 'subscriptions') renderSubscriptions();
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'add-tx-modal') document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+  if (id === 'add-sub-modal') document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModalOutside(e, id) { if (e.target.id === id) closeModal(id); }
+
+function addTransaction() {
+  const desc = document.getElementById('tx-desc').value.trim();
+  const amount = parseFloat(document.getElementById('tx-amount').value);
+  const type = document.getElementById('tx-type').value;
+  const category = document.getElementById('tx-cat').value;
+  const date = document.getElementById('tx-date').value;
+  if (!desc || !amount || !date) return alert('Please fill all fields');
+  transactions.unshift({id: Date.now(), description: desc, amount, type, category, date});
+  saveData('tx', transactions);
+  closeModal('add-tx-modal');
+  renderTransactions();
+  updateDashboardSummary();
+  document.getElementById('tx-desc').value = '';
+  document.getElementById('tx-amount').value = '';
+}
+
+function deleteTransaction(id) {
+  if (!confirm('Delete this transaction?')) return;
+  transactions = transactions.filter(t => t.id !== id);
+  saveData('tx', transactions);
+  renderTransactions();
+  updateDashboardSummary();
+}
+
+function addBudget() {
+  const category = document.getElementById('budget-cat').value;
+  const amount = parseFloat(document.getElementById('budget-amount').value);
+  if (!amount) return alert('Please enter an amount');
+  const existing = budgets.findIndex(b => b.category === category);
+  if (existing >= 0) budgets[existing].amount = amount;
+  else budgets.push({id: Date.now(), category, amount});
+  saveData('budgets', budgets);
+  closeModal('add-budget-modal');
+  renderBudgets();
+  document.getElementById('budget-amount').value = '';
+}
+
+function deleteBudget(id) {
+  budgets = budgets.filter(b => b.id !== id);
+  saveData('budgets', budgets);
+  renderBudgets();
+}
+
+function addSubscription() {
+  const name = document.getElementById('sub-name').value.trim();
+  const amount = parseFloat(document.getElementById('sub-amount').value);
+  const cycle = document.getElementById('sub-cycle').value;
+  const nextDate = document.getElementById('sub-date').value;
+  if (!name || !amount || !nextDate) return alert('Please fill all fields');
+  subscriptions.push({id: Date.now(), name, amount, cycle, nextDate, color: SUB_COLORS[subscriptions.length % SUB_COLORS.length]});
+  saveData('subs', subscriptions);
+  closeModal('add-sub-modal');
+  renderSubscriptions();
+  document.getElementById('sub-name').value = '';
+  document.getElementById('sub-amount').value = '';
+}
+
+function deleteSubscription(id) {
+  subscriptions = subscriptions.filter(s => s.id !== id);
+  saveData('subs', subscriptions);
+  renderSubscriptions();
+}
+
+function renderTransactions() {
+  const search = (document.getElementById('tx-search')?.value || '').toLowerCase();
+  const filter = document.getElementById('tx-filter')?.value || '';
+  const filtered = transactions.filter(t =>
+    (!search || t.description.toLowerCase().includes(search) || t.category.toLowerCase().includes(search)) &&
+    (!filter || t.type === filter)
+  );
+  const el = document.getElementById('tx-list');
+  if (!filtered.length) { el.innerHTML = '<div class="card p-8 text-center text-gray-400">No transactions found</div>'; return; }
+  el.innerHTML = filtered.map(t => `
+    <div class="card p-4 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-xl flex-shrink-0">${CAT_ICONS[t.category]||'💳'}</div>
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-gray-900 text-sm truncate">${t.description}</p>
+        <p class="text-gray-400 text-xs mt-0.5">${t.category} · ${new Date(t.date).toLocaleDateString()}</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-sm ${t.type==='INCOME'?'text-green-600':'text-red-500'}">${t.type==='INCOME'?'+':'-'}${fmt(t.amount)}</span>
+        <button onclick="deleteTransaction(${t.id})" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function renderBudgets() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  const monthTx = transactions.filter(t => {
+    const d = new Date(t.date);
+    return t.type === 'EXPENSE' && d.getMonth()+1 === month && d.getFullYear() === year;
+  });
+
+  let totalBudgeted = 0, totalSpent = 0;
+  const el = document.getElementById('budget-list');
+  el.innerHTML = budgets.map(b => {
+    const spent = monthTx.filter(t => t.category === b.category).reduce((s,t) => s+t.amount, 0);
+    const pct = Math.min(100, Math.round((spent/b.amount)*100));
+    const remaining = b.amount - spent;
+    totalBudgeted += b.amount;
+    totalSpent += spent;
+    const color = pct >= 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
+    return `<div class="card p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">${CAT_ICONS[b.category]||'💳'}</span>
+          <span class="font-bold text-gray-900">${b.category}</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-semibold text-gray-500">${fmt(spent)} / ${fmt(b.amount)}</span>
+          <button onclick="deleteBudget(${b.id})" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
+        </div>
+      </div>
+      <div class="bg-gray-100 rounded-full h-3 overflow-hidden">
+        <div class="h-3 rounded-full progress-bar" style="width:${pct}%;background:${color}"></div>
+      </div>
+      <div class="flex justify-between mt-2">
+        <span class="text-xs font-semibold" style="color:${color}">${pct}% used</span>
+        <span class="text-xs text-gray-400">${remaining >= 0 ? fmt(remaining)+' left' : fmt(Math.abs(remaining))+' over'}</span>
+      </div>
+    </div>`;
+  }).join('') || '<div class="card p-8 text-center text-gray-400">No budgets set. Add one to get started!</div>';
+
+  document.getElementById('total-budgeted').textContent = fmt(totalBudgeted);
+  document.getElementById('total-budget-spent').textContent = fmt(totalSpent);
+  document.getElementById('total-remaining').textContent = fmt(Math.max(0, totalBudgeted - totalSpent));
+}
+
+function renderSubscriptions() {
+  let monthly = 0, yearly = 0;
+  subscriptions.forEach(s => {
+    if (s.cycle === 'Monthly') { monthly += s.amount; yearly += s.amount * 12; }
+    else { yearly += s.amount; monthly += s.amount / 12; }
+  });
+  document.getElementById('sub-monthly').textContent = fmt(monthly);
+  document.getElementById('sub-yearly').textContent = fmt(yearly);
+
+  const el = document.getElementById('sub-list');
+  el.innerHTML = subscriptions.map(s => {
+    const days = Math.ceil((new Date(s.nextDate) - new Date()) / 86400000);
+    const urgent = days <= 7;
+    return `<div class="card p-4 flex items-center gap-3">
+      <div class="w-3 h-10 rounded-full flex-shrink-0" style="background:${s.color}"></div>
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-gray-900">${s.name}</p>
+        <p class="text-gray-400 text-xs mt-0.5">${s.cycle} · Next: ${new Date(s.nextDate).toLocaleDateString()}</p>
+        ${urgent ? `<span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded-full">Due in ${days}d</span>` : ''}
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-gray-900">${fmt(s.amount)}</span>
+        <button onclick="deleteSubscription(${s.id})" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
+      </div>
+    </div>`;
+  }).join('') || '<div class="card p-8 text-center text-gray-400">No subscriptions. Add one!</div>';
+}
+
+function updateDashboardSummary() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  const monthTx = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getMonth()+1 === month && d.getFullYear() === year;
+  });
+  const income = monthTx.filter(t=>t.type==='INCOME').reduce((s,t)=>s+t.amount,0);
+  const expenses = monthTx.filter(t=>t.type==='EXPENSE').reduce((s,t)=>s+t.amount,0);
+  const net = income - expenses;
+  const rate = income > 0 ? Math.round((net/income)*100) : 0;
+  document.getElementById('net-savings').textContent = fmt(net);
+  document.getElementById('total-income').textContent = fmt(income);
+  document.getElementById('total-expenses').textContent = fmt(expenses);
+  document.getElementById('savings-rate').textContent = rate + '%';
+
+  // Recent transactions
+  const recentEl = document.getElementById('recent-tx');
+  recentEl.innerHTML = transactions.slice(0,5).map(t => `
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-sm flex-shrink-0">${CAT_ICONS[t.category]||'💳'}</div>
+      <div class="flex-1 min-w-0"><p class="text-sm font-semibold text-gray-800 truncate">${t.description}</p><p class="text-xs text-gray-400">${t.category}</p></div>
+      <span class="text-sm font-bold ${t.type==='INCOME'?'text-green-600':'text-red-500'}">${t.type==='INCOME'?'+':'-'}${fmt(t.amount)}</span>
+    </div>`).join('');
+
+  // Upcoming subscriptions
+  const upEl = document.getElementById('upcoming-subs');
+  const upcoming = subscriptions.filter(s => {
+    const days = (new Date(s.nextDate) - new Date()) / 86400000;
+    return days >= 0 && days <= 14;
+  }).slice(0,4);
+  upEl.innerHTML = upcoming.length ? upcoming.map(s => `
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-8 rounded-full flex-shrink-0" style="background:${s.color}"></div>
+      <div class="flex-1"><p class="text-sm font-semibold text-gray-800">${s.name}</p><p class="text-xs text-gray-400">${new Date(s.nextDate).toLocaleDateString()}</p></div>
+      <span class="text-sm font-bold text-gray-900">${fmt(s.amount)}</span>
+    </div>`).join('') : '<p class="text-gray-400 text-sm">No upcoming bills in 14 days 🎉</p>';
+}
+
+let trendChart, pieChart;
+function initCharts() {
+  const months = ['Nov','Dec','Jan','Feb','Mar','Apr'];
+  const incomeData = [4200, 5100, 4800, 6200, 5500, 6350];
+  const expenseData = [3100, 2900, 3200, 2600, 3000, 2847];
+
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById('trend-chart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        {label:'Income',data:incomeData,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4,pointRadius:3},
+        {label:'Expenses',data:expenseData,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.1)',fill:true,tension:.4,pointRadius:3}
+      ]
+    },
+    options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}},scales:{y:{beginAtZero:false,ticks:{callback:v=>'$'+v.toLocaleString(),font:{size:10}},grid:{color:'#f3f4f6'}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
+  });
+
+  const cats = ['Groceries','Food & Dining','Transport','Entertainment','Shopping','Utilities','Other'];
+  const catAmounts = [124.5, 25.25, 24, 25.98, 67.23, 89, 32.15];
+  const catColors = cats.map(c => CAT_COLORS[c] || '#94a3b8');
+
+  if (pieChart) pieChart.destroy();
+  pieChart = new Chart(document.getElementById('pie-chart'), {
+    type: 'doughnut',
+    data: { labels: cats, datasets: [{data:catAmounts,backgroundColor:catColors,borderWidth:2,borderColor:'#fff'}] },
+    options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}}},cutout:'60%'}
+  });
+}
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dash-greeting').textContent = g + ', Alex 👋';
+}
+
+function initApp() {
+  setGreeting();
+  updateDashboardSummary();
+  setTimeout(initCharts, 100);
+  showPage('dashboard');
+}
+
+// Auto-login check
+window.onload = () => {
+  if (localStorage.getItem('ft_auth') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  }
+};
+
+// Enter key on login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
+});
+</script>
+</body>
+</html>
