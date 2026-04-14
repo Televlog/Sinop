@@ -152,7 +152,7 @@ export default function ProfileScreen() {
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
 
-      <Text style={styles.version}>FinTrack v1.0.0</Text>
+      <Text style={styles.version}>Sinop App v1.0.0</Text>
     </ScrollView>
   );
 }

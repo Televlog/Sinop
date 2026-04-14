@@ -1,7 +1,7 @@
 {
-  "name": "fintrack-backend",
+  "name": "sinop-backend",
   "version": "1.0.0",
-  "description": "FinTrack - Personal Finance & Subscription Tracking API",
+  "description": "Sinop App - Personal Finance & Subscription Tracking API",
   "main": "dist/app.js",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec ts-node --transpile-only src/app.ts",

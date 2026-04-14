@@ -174,11 +174,11 @@ export const exportPDF = asyncHandler(async (req: Request, res: Response) => {
 
   const doc = new PDFDocument({ margin: 50 });
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename=fintrack-report-${year}-${month}.pdf`);
+  res.setHeader('Content-Disposition', `attachment; filename=sinop-report-${year}-${month}.pdf`);
   doc.pipe(res);
 
   // Header
-  doc.fontSize(24).font('Helvetica-Bold').text('FinTrack', { align: 'center' });
+  doc.fontSize(24).font('Helvetica-Bold').text('Sinop App', { align: 'center' });
   doc.fontSize(14).font('Helvetica').text(`Monthly Report — ${startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`, { align: 'center' });
   doc.moveDown();
   doc.text(`Generated for: ${user?.name ?? user?.email}`, { align: 'center' });
@@ -224,7 +224,7 @@ export const exportExcel = asyncHandler(async (req: Request, res: Response) => {
   });
 
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = 'FinTrack';
+  workbook.creator = 'Sinop App';
 
   const sheet = workbook.addWorksheet('Transactions');
   sheet.columns = [
@@ -260,7 +260,7 @@ export const exportExcel = asyncHandler(async (req: Request, res: Response) => {
   }
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename=fintrack-${year}-${month}.xlsx`);
+  res.setHeader('Content-Disposition', `attachment; filename=sinop-${year}-${month}.xlsx`);
 
   await workbook.xlsx.write(res);
   res.end();

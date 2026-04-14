@@ -8,7 +8,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center text-xl font-bold">F</div>
-            <span className="text-2xl font-bold">FinTrack</span>
+            <span className="text-2xl font-bold">Sinop App</span>
           </div>
         </div>
 
@@ -31,7 +31,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <p className="text-white/50 text-sm">
-          © {new Date().getFullYear()} FinTrack. All rights reserved.
+          © {new Date().getFullYear()} Sinop App. All rights reserved.
         </p>
       </div>
 
@@ -41,7 +41,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           {/* Mobile logo */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
             <div className="w-8 h-8 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold">F</div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">FinTrack</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Sinop App</span>
           </div>
           {children}
         </div>

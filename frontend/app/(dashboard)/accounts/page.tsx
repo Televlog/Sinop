@@ -161,7 +161,7 @@ export default function AccountsPage() {
           <div>
             <h4 className="font-semibold text-blue-900 dark:text-blue-300 text-sm">Bank-level Security</h4>
             <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
-              FinTrack uses Plaid to connect your accounts. We never store your bank credentials.
+              Sinop App uses Plaid to connect your accounts. We never store your bank credentials.
               All data is encrypted in transit and at rest.
             </p>
           </div>

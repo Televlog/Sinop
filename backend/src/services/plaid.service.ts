@@ -22,7 +22,7 @@ export const plaidService = {
 
     const response = await plaidClient.linkTokenCreate({
       user: { client_user_id: userId },
-      client_name: 'FinTrack',
+      client_name: 'Sinop App',
       products: [Products.Transactions],
       country_codes: [CountryCode.Us],
       language: 'en',

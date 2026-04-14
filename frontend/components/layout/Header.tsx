@@ -34,7 +34,7 @@ export default function Header() {
     refetchInterval: 60_000,
   });
 
-  const title = Object.entries(PAGE_TITLES).find(([path]) => pathname.startsWith(path))?.[1] ?? 'FinTrack';
+  const title = Object.entries(PAGE_TITLES).find(([path]) => pathname.startsWith(path))?.[1] ?? 'Sinop App';
   const unreadCount = notifData?.unreadCount ?? 0;
 
   return (

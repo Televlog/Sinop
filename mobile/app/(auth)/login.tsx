@@ -46,7 +46,7 @@ export default function LoginScreen() {
             <Text style={styles.logoText}>F</Text>
           </View>
           <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>Sign in to your FinTrack account</Text>
+          <Text style={styles.subtitle}>Sign in to your Sinop App account</Text>
         </View>
 
         {/* Form */}

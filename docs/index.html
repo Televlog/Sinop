@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinTrack - Personal Finance</title>
+<title>Sinop App - Personal Finance</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -53,7 +53,7 @@
         <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
           <span class="text-white text-2xl font-bold">F</span>
         </div>
-        <h1 class="text-xl font-bold text-gray-900">Welcome to FinTrack</h1>
+        <h1 class="text-xl font-bold text-gray-900">Welcome to Sinop App</h1>
         <p class="text-gray-500 text-sm mt-1">Sign in to your account</p>
       </div>
       <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 mb-4 text-sm"></div>
@@ -69,8 +69,8 @@
         <button onclick="doLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors mt-1">Sign In</button>
       </div>
       <div class="mt-4 p-3 bg-gray-50 rounded-xl text-xs text-gray-500 space-y-1">
-        <p><b>Demo User:</b> demo@fintrack.app / Demo123!</p>
-        <p><b>Admin:</b> admin@fintrack.app / Admin123!</p>
+        <p><b>Demo User:</b> demo@sinopapp.com / Demo123!</p>
+        <p><b>Admin:</b> admin@sinopapp.com / Admin123!</p>
       </div>
     </div>
   </div>
@@ -85,7 +85,7 @@
       <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
         <span class="text-white font-bold text-sm">F</span>
       </div>
-      <span class="font-bold text-gray-900">FinTrack</span>
+      <span class="font-bold text-gray-900">Sinop App</span>
     </div>
     <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
       <div class="nav-item active flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700" onclick="showPage('dashboard')" data-page="dashboard"><i class="fa-solid fa-house w-4 text-center text-xs"></i>Dashboard</div>
@@ -431,8 +431,8 @@
 <script>
 // ===================== DATA =====================
 const ACCOUNTS = {
-  'demo@fintrack.app':  {password:'Demo123!',role:'USER'},
-  'admin@fintrack.app': {password:'Admin123!',role:'ADMIN'},
+  'demo@sinopapp.com':  {password:'Demo123!',role:'USER'},
+  'admin@sinopapp.com': {password:'Admin123!',role:'ADMIN'},
 };
 const CAT_ICONS={'Food & Dining':'🍽️','Groceries':'🛒','Transportation':'🚗','Entertainment':'🎬','Shopping':'🛍️','Healthcare':'💊','Utilities':'💡','Income':'💰','Fitness':'🏋️','Subscriptions':'📱','Other':'💳'};
 const CAT_COLORS={'Food & Dining':'#f59e0b','Groceries':'#10b981','Transportation':'#3b82f6','Entertainment':'#8b5cf6','Shopping':'#ec4899','Healthcare':'#ef4444','Utilities':'#6b7280','Income':'#10b981','Fitness':'#7c3aed','Other':'#94a3b8'};
@@ -484,10 +484,10 @@ let subscriptions=ld('subs',[
   {id:6,name:'Planet Fitness',amount:25.00,cycle:'Monthly',nextDate:'2026-04-17',status:'Active',category:'Fitness',color:'#7c3aed'},
 ]);
 let users=ld('users',[
-  {id:1,name:'Alex Johnson',email:'demo@fintrack.app',role:'USER',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:false,admin_panel:false}},
-  {id:2,name:'Admin User',email:'admin@fintrack.app',role:'ADMIN',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:true,admin_panel:true}},
-  {id:3,name:'Jane Smith',email:'jane@fintrack.app',role:'USER',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:false,admin_panel:false}},
-  {id:4,name:'Bob Wilson',email:'bob@fintrack.app',role:'VIEWER',status:'inactive',perms:{view_dashboard:true,manage_transactions:false,manage_budgets:false,manage_subscriptions:false,view_reports:true,manage_users:false,admin_panel:false}},
+  {id:1,name:'Alex Johnson',email:'demo@sinopapp.com',role:'USER',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:false,admin_panel:false}},
+  {id:2,name:'Admin User',email:'admin@sinopapp.com',role:'ADMIN',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:true,admin_panel:true}},
+  {id:3,name:'Jane Smith',email:'jane@sinopapp.com',role:'USER',status:'active',perms:{view_dashboard:true,manage_transactions:true,manage_budgets:true,manage_subscriptions:true,view_reports:true,manage_users:false,admin_panel:false}},
+  {id:4,name:'Bob Wilson',email:'bob@sinopapp.com',role:'VIEWER',status:'inactive',perms:{view_dashboard:true,manage_transactions:false,manage_budgets:false,manage_subscriptions:false,view_reports:true,manage_users:false,admin_panel:false}},
 ]);
 
 let currentUser=null;
@@ -811,7 +811,7 @@ function addUser(){
 }
 function deleteUser(id){
   const u=users.find(x=>x.id===id);
-  if(u&&(u.email==='admin@fintrack.app'||u.email==='demo@fintrack.app')){alert('Cannot delete built-in accounts.');return;}
+  if(u&&(u.email==='admin@sinopapp.com'||u.email==='demo@sinopapp.com')){alert('Cannot delete built-in accounts.');return;}
   if(!confirm('Delete this user?'))return;
   users=users.filter(x=>x.id!==id);sv('users',users);renderAdmin();
 }
@@ -910,7 +910,7 @@ window.onload=()=>{
     document.getElementById('app').style.display='block';
     initApp();
   } else {
-    document.getElementById('login-email').value='demo@fintrack.app';
+    document.getElementById('login-email').value='demo@sinopapp.com';
     document.getElementById('login-password').value='Demo123!';
   }
 };

@@ -51,7 +51,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className={cn('flex items-center h-16 px-4 border-b border-gray-100 dark:border-gray-700', collapsed ? 'justify-center' : 'gap-3')}>
         <div className="w-8 h-8 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0">F</div>
-        {!collapsed && <span className="text-lg font-bold text-gray-900 dark:text-white">FinTrack</span>}
+        {!collapsed && <span className="text-lg font-bold text-gray-900 dark:text-white">Sinop App</span>}
       </div>
 
       {/* Nav */}

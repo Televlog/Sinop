@@ -38,7 +38,7 @@ export const env = {
   SMTP_PORT: parseInt(optional('SMTP_PORT', '587'), 10),
   SMTP_USER: optional('SMTP_USER', ''),
   SMTP_PASS: optional('SMTP_PASS', ''),
-  EMAIL_FROM: optional('EMAIL_FROM', 'FinTrack <noreply@fintrack.app>'),
+  EMAIL_FROM: optional('EMAIL_FROM', 'Sinop App <noreply@sinopapp.com>'),
 
   CLOUDINARY_CLOUD_NAME: optional('CLOUDINARY_CLOUD_NAME', ''),
   CLOUDINARY_API_KEY: optional('CLOUDINARY_API_KEY', ''),

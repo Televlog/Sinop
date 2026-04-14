@@ -6,14 +6,14 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: { default: 'FinTrack', template: '%s | FinTrack' },
+  title: { default: 'Sinop App', template: '%s | Sinop App' },
   description: 'Smart personal finance & subscription tracking',
   keywords: ['finance', 'budget', 'money', 'subscription', 'tracker', 'spending'],
-  authors: [{ name: 'FinTrack' }],
+  authors: [{ name: 'Sinop App' }],
   manifest: '/manifest.json',
   icons: { icon: '/favicon.ico', apple: '/apple-icon.png' },
   openGraph: {
-    title: 'FinTrack – Smart Personal Finance',
+    title: 'Sinop App – Smart Personal Finance',
     description: 'Track expenses, manage subscriptions, and reach your financial goals.',
     type: 'website',
   },

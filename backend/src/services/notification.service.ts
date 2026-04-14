@@ -45,10 +45,10 @@ export const notificationService = {
     const url = `${env.CLIENT_URL}/auth/verify-email/${token}`;
     await this.sendEmail(
       email,
-      'Verify your FinTrack email',
+      'Verify your Sinop App email',
       `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px">
-        <h1 style="color:#4F46E5">Welcome to FinTrack!</h1>
+        <h1 style="color:#4F46E5">Welcome to Sinop App!</h1>
         <p>Hi ${name}, please verify your email address to get started.</p>
         <a href="${url}" style="background:#4F46E5;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin:16px 0">
           Verify Email
@@ -63,7 +63,7 @@ export const notificationService = {
     const url = `${env.CLIENT_URL}/auth/reset-password/${token}`;
     await this.sendEmail(
       email,
-      'Reset your FinTrack password',
+      'Reset your Sinop App password',
       `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px">
         <h1 style="color:#4F46E5">Password Reset</h1>

@@ -192,7 +192,7 @@ async function start() {
   initializeCronJobs();
 
   server.listen(env.PORT, () => {
-    logger.info(`🚀 FinTrack API running on http://localhost:${env.PORT}`);
+    logger.info(`🚀 Sinop App API running on http://localhost:${env.PORT}`);
     logger.info(`📊 Environment: ${env.NODE_ENV}`);
   });
 

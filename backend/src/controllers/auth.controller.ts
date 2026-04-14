@@ -234,7 +234,7 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
 
 export const setupMfa = asyncHandler(async (req: Request, res: Response) => {
   const secret = speakeasy.generateSecret({
-    name: `FinTrack (${req.user!.email})`,
+    name: `Sinop App (${req.user!.email})`,
     length: 32,
   });
 

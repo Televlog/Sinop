@@ -75,7 +75,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'fintrack-auth',
+      name: 'sinop-auth',
       partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
     }
   )

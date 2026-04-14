@@ -9,10 +9,10 @@ async function main() {
   // Admin user
   const adminHash = await bcrypt.hash('Admin123!', 12);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@fintrack.app' },
+    where: { email: 'admin@sinopapp.com' },
     update: {},
     create: {
-      email: 'admin@fintrack.app',
+      email: 'admin@sinopapp.com',
       name: 'Admin User',
       passwordHash: adminHash,
       role: 'ADMIN',
@@ -24,10 +24,10 @@ async function main() {
   // Demo user
   const userHash = await bcrypt.hash('Demo123!', 12);
   const user = await prisma.user.upsert({
-    where: { email: 'demo@fintrack.app' },
+    where: { email: 'demo@sinopapp.com' },
     update: {},
     create: {
-      email: 'demo@fintrack.app',
+      email: 'demo@sinopapp.com',
       name: 'Alex Johnson',
       passwordHash: userHash,
       role: 'USER',
@@ -160,8 +160,8 @@ async function main() {
   });
 
   console.log(`✅ Seeded successfully!`);
-  console.log(`   Admin: admin@fintrack.app / Admin123!`);
-  console.log(`   Demo:  demo@fintrack.app  / Demo123!`);
+  console.log(`   Admin: admin@sinopapp.com / Admin123!`);
+  console.log(`   Demo:  demo@sinopapp.com  / Demo123!`);
 }
 
 main()

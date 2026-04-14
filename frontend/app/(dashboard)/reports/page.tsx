@@ -47,7 +47,7 @@ export default function ReportsPage() {
     setExporting('pdf');
     try {
       const blob = await reportApi.exportPDF({ month, year });
-      downloadBlob(blob, `fintrack-report-${year}-${month}.pdf`);
+      downloadBlob(blob, `sinop-report-${year}-${month}.pdf`);
     } catch (err) {
       toast({ title: 'Export failed', description: getErrorMessage(err), variant: 'destructive' });
     } finally { setExporting(null); }
@@ -57,7 +57,7 @@ export default function ReportsPage() {
     setExporting('excel');
     try {
       const blob = await reportApi.exportExcel({ month, year });
-      downloadBlob(blob, `fintrack-${year}-${month}.xlsx`);
+      downloadBlob(blob, `sinop-${year}-${month}.xlsx`);
     } catch (err) {
       toast({ title: 'Export failed', description: getErrorMessage(err), variant: 'destructive' });
     } finally { setExporting(null); }
